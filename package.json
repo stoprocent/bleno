@@ -1,6 +1,6 @@
 {
   "name": "@stoprocent/bleno",
-  "version": "1.0.0",
+  "version": "0.7.0",
   "description": "A Node.js module for implementing BLE (Bluetooth Low Energy) peripherals",
   "main": "./index.js",
   "types": "./index.d.ts",
