@@ -6,13 +6,19 @@ lib-cov
 *.out
 *.pid
 *.gz
+.nyc_output
 
 pids
 logs
 results
+coverage
 
-npm-debug.log
-node_modules
 build
+prebuilds
+node_modules
+npm-debug.log
 
-lib/mac/native
+.vscode/
+.idea/
+
+.DS_Store
