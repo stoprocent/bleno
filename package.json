@@ -1,8 +1,9 @@
 {
-  "name": "@abandonware/bleno",
-  "version": "0.6.1",
+  "name": "@stoprocent/bleno",
+  "version": "1.0.0",
   "description": "A Node.js module for implementing BLE (Bluetooth Low Energy) peripherals",
-  "main": "index.js",
+  "main": "./index.js",
+  "types": "./index.d.ts",
   "engines": {
     "node": ">=14"
   },
@@ -14,12 +15,20 @@
     "win32"
   ],
   "scripts": {
-    "pretest": "jshint *.js lib/. test/. examples/.",
-    "test": "mocha -R spec test/*.js"
+    "install": "node-gyp-build",
+    "lint": "eslint \"**/*.js\"",
+    "lint-fix": "eslint \"**/*.js\" --fix",
+    "prebuildify": "prebuildify --napi --target 14.0.0 --force --strip --verbose",
+    "prebuildify-cross": "prebuildify-cross --napi --target 14.0.0 --force --strip --verbose",
+    "semantic-release": "semantic-release",
+    "pretest": "npm run rebuild",
+    "rebuild": "node-gyp rebuild",
+    "coverage": "nyc npm test && nyc report --reporter=text-lcov > .nyc_output/lcov.info",
+    "test": "cross-env NODE_ENV=test mocha --recursive \"test/*.test.js\" \"test/**/*.test.js\" --exit"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/abandonware/bleno"
+    "url": "https://github.com/stoprocent/bleno"
   },
   "keywords": [
     "BLE",
@@ -28,27 +37,40 @@
     "Bluetooth Smart",
     "peripheral"
   ],
-  "author": "Sandeep Mistry",
+  "author": "Sandeep Mistry <sandeep.mistry@gmail.com>",
   "maintainers": [
-    "Jacob Rosenthal"
+    "Marek Serafin <marek@serafin.email>"
   ],
   "license": "MIT",
   "readmeFilename": "README.md",
   "devDependencies": {
+    "@semantic-release/exec": "^6.0.3",
     "jshint": "~2.13.6",
+    "eslint": "^8.31.0",
+    "eslint-config-semistandard": "^17.0.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.6.0",
+    "eslint-plugin-promise": "^6.1.1",
     "should": "~13.2.3",
     "mocha": "~10.2.0",
-    "node-blink1": "~0.5.1"
+    "node-blink1": "~0.5.1",
+    "prebuildify": "^5.0.1",
+    "prebuildify-cross": "5.0.0"
+
   },
   "dependencies": {
     "debug": "^4.3.4",
-    "napi-thread-safe-callback": "0.0.6",
-    "node-addon-api": "^6.1.0"
+    "napi-thread-safe-callback": "^0.0.6",
+    "node-addon-api": "^4.3.0",
+    "node-gyp-build": "^4.5.0"
   },
   "optionalDependencies": {
-    "@abandonware/bluetooth-hci-socket": "^0.5.3-10",
+    "@stoprocent/bluetooth-hci-socket": "^1.1.3",
     "bplist-parser": "0.3.2",
     "xpc-connect": "^3.0.0"
   },
-  "types": "./index.d.ts"
+  "publishConfig": {
+    "access": "public"
+  }
 }
