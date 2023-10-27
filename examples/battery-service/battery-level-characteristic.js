@@ -1,8 +1,6 @@
-const util = require('util');
 const os = require('os');
-const exec = util.promisify(require('child_process').exec);
-
 const bleno = require('../..');
+const { execSync } = require('child_process');
 const Descriptor = bleno.Descriptor;
 const Characteristic = bleno.Characteristic;
 
@@ -24,10 +22,10 @@ class BatteryLevelCharacteristic extends Characteristic {
     });
   }
 
-  async onReadRequest (offset, callback) {
+  onReadRequest (offset, callback) {
     if (os.platform() === 'darwin') {
       try {
-        const { stdout } = await exec('pmset -g batt');
+        const { stdout } = execSync('pmset -g batt');
         const data = stdout.toString();
         // data - 'Now drawing from \'Battery Power\'\n -InternalBattery-0\t95%; discharging; 4:11 remaining\n'
         let percent = data.split('\t')[1].split(';')[0];
