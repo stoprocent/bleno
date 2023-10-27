@@ -13,6 +13,40 @@ __Note:__ macOS / Mac OS X, Linux, FreeBSD and Windows are currently the only su
 
 ## Prerequisites
 
+#### UART (Any OS)
+
+Please refer to [https://github.com/stoprocent/node-bluetooth-hci-socket#uartserial-any-os](https://github.com/stoprocent/node-bluetooth-hci-socket#uartserial-any-os)
+
+##### Example 1 (UART port spcified as enviromental variable)
+
+```bash
+$ export BLUETOOTH_HCI_SOCKET_UART_PORT=/dev/tty...
+$ export BLUETOOTH_HCI_SOCKET_UART_BAUDRATE=1000000
+```
+
+__NOTE:__ `BLUETOOTH_HCI_SOCKET_UART_BAUDRATE` defaults to `1000000` so only needed if different.
+
+```javascript
+const bleno = require('@stoprocent/bleno');
+```
+
+##### Example 2 (UART port spcified in `bindParams`)
+
+```bash
+$ export BLUETOOTH_HCI_SOCKET_FORCE_UART=1
+```
+
+```javascript
+const bleno = require('@stoprocent/bleno/with-custom-binding') ( { 
+  bindParams: { 
+    uart: { 
+      port: '/dev/tty...', 
+      baudRate: 1000000
+    } 
+  } 
+} );
+```
+
 ### OS X
 
  * install the XCode command line tools via `xcode-select --install`
@@ -94,6 +128,15 @@ var bleno = require('bleno');
 See [examples folder](https://github.com/sandeepmistry/bleno/blob/master/examples) for code examples.
 
 ### Actions
+
+#### Set address
+
+```javascript
+bleno.setAddress('00:11:22:33:44:55'); // set adapter's mac address
+```
+__NOTE:__ Curently this feature is only supported on HCI as it's using vendor specific commands. Source of the commands is based on the [BlueZ bdaddr.c](https://github.com/pauloborges/bluez/blob/master/tools/bdaddr.c).
+__NOTE:__ `bleno.state` must be `poweredOn` before address can be set. `bleno.on('stateChange', callback(state));` can be used to listen for state change events.
+
 
 #### Advertising
 
