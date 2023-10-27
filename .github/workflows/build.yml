@@ -1,0 +1,76 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+      - beta
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  prebuild:
+    strategy:
+      matrix:
+        include:
+          - name: darwin
+            os: macos-11  
+            node: x64
+            command: prebuildify
+            args: --arch x64+arm64
+          - name: win32-x86
+            os: windows-2019
+            node: x86
+            command: prebuildify
+          - name: win32-x64
+            os: windows-2019
+            node: x64
+            command: prebuildify
+          - name: linux-x64
+            os: ubuntu-latest
+            command: prebuildify-cross
+            args: -i centos7-devtoolset7 -i alpine
+          - name: linux-arm
+            os: ubuntu-latest
+            command: prebuildify-cross
+            args: -i linux-arm64-lts -i linux-armv7 -i linux-armv6
+          - name: android-arm
+            os: ubuntu-latest
+            command: prebuildify-cross
+            args: -i android-arm64 -i android-armv7
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - if: matrix.node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          architecture: ${{ matrix.node }}
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: npm run ${{ matrix.command }} -- ${{ matrix.args }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: prebuilds/
+          if-no-files-found: error
+      - if: failure()
+        run: npx shx ls -lA
+        
+  release:
+    needs: prebuild
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: prebuilds
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - run: npm ci
+      - run: npm run semantic-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
