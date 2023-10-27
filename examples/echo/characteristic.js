@@ -1,52 +1,45 @@
-const util = require('util');
-
 const bleno = require('../..');
 
 const BlenoCharacteristic = bleno.Characteristic;
 
-const EchoCharacteristic = function () {
-  EchoCharacteristic.super_.call(this, {
-    uuid: 'ec0e',
-    properties: ['read', 'write', 'notify'],
-    value: null
-  });
+class EchoCharacteristic extends BlenoCharacteristic {
+  constructor () {
+    super({
+      uuid: 'ec0e',
+      properties: ['read', 'write', 'notify'],
+      value: null
+    });
 
-  this._value = Buffer.alloc(0);
-  this._updateValueCallback = null;
-};
-
-util.inherits(EchoCharacteristic, BlenoCharacteristic);
-
-EchoCharacteristic.prototype.onReadRequest = function (offset, callback) {
-  console.log('EchoCharacteristic - onReadRequest: value = ' + this._value.toString('hex'));
-
-  callback(this.RESULT_SUCCESS, this._value);
-};
-
-EchoCharacteristic.prototype.onWriteRequest = function (data, offset, withoutResponse, callback) {
-  this._value = data;
-
-  console.log('EchoCharacteristic - onWriteRequest: value = ' + this._value.toString('hex'));
-
-  if (this._updateValueCallback) {
-    console.log('EchoCharacteristic - onWriteRequest: notifying');
-
-    this._updateValueCallback(this._value);
+    this._value = Buffer.alloc(0);
+    this._updateValueCallback = null;
   }
 
-  callback(this.RESULT_SUCCESS);
-};
+  onReadRequest (offset, callback) {
+    console.log('EchoCharacteristic - onReadRequest: value = ' + this._value.toString('hex'));
+    callback(this.RESULT_SUCCESS, this._value);
+  }
 
-EchoCharacteristic.prototype.onSubscribe = function (maxValueSize, updateValueCallback) {
-  console.log('EchoCharacteristic - onSubscribe');
+  onWriteRequest (data, offset, withoutResponse, callback) {
+    this._value = data;
+    console.log('EchoCharacteristic - onWriteRequest: value = ' + this._value.toString('hex'));
 
-  this._updateValueCallback = updateValueCallback;
-};
+    if (this._updateValueCallback) {
+      console.log('EchoCharacteristic - onWriteRequest: notifying');
+      this._updateValueCallback(this._value);
+    }
 
-EchoCharacteristic.prototype.onUnsubscribe = function () {
-  console.log('EchoCharacteristic - onUnsubscribe');
+    callback(this.RESULT_SUCCESS);
+  }
 
-  this._updateValueCallback = null;
-};
+  onSubscribe (maxValueSize, updateValueCallback) {
+    console.log('EchoCharacteristic - onSubscribe');
+    this._updateValueCallback = updateValueCallback;
+  }
+
+  onUnsubscribe () {
+    console.log('EchoCharacteristic - onUnsubscribe');
+    this._updateValueCallback = null;
+  }
+}
 
 module.exports = EchoCharacteristic;
