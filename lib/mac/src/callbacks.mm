@@ -6,7 +6,7 @@
 //
 #include "callbacks.h"
 
-#include <napi-thread-safe-callback.hpp>
+#import <napi-thread-safe-callback.hpp>
 
 #include "napi_objc.h"
 

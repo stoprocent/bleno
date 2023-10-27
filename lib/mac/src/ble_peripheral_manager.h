@@ -21,11 +21,11 @@
 - (nonnull instancetype)init NS_DESIGNATED_INITIALIZER;
 
 - (void)start;
-- (void)startAdvertising:(nonnull NSString *)name serviceUUIDs:(nonnull NSArray<CBUUID *> *)serviceUUIDs;
-- (void)startAdvertisingIBeacon:(NSData *)data;
-- (void)startAdvertisingWithEIRData:(NSData *)data;
+- (void)startAdvertising:(NSString * _Nonnull)name serviceUUIDs:(NSArray<CBUUID *> * _Nonnull)serviceUUIDs;
+- (void)startAdvertisingIBeacon:(NSData * _Nullable)data;
+- (void)startAdvertisingWithEIRData:(NSData * _Nullable)data;
 - (void)stopAdvertising;
-- (void)setServices:(nonnull NSArray<CBMutableService *> *)services;
+- (void)setServices:(NSArray<CBMutableService *> * _Nonnull)services;
 - (void)disconnect;
 - (void)updateRssi;
 

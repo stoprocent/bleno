@@ -1,26 +1,39 @@
 {
+  'variables': {
+    'openssl_fips' : '' 
+  },
   'targets': [
     {
       'target_name': 'binding',
-      'sources': [ 'src/bleno_mac.mm', 'src/napi_objc.mm', 'src/ble_peripheral_manager.mm', 'src/objc_cpp.mm', 'src/callbacks.mm'  ],
-      'include_dirs': ["<!@(node -p \"require('node-addon-api').include\")", "<!@(node -p \"require('napi-thread-safe-callback').include\")"],
-      'dependencies': ["<!(node -p \"require('node-addon-api').gyp\")"],
+      'sources': [ 
+        'src/bleno_mac.mm', 
+        'src/napi_objc.mm', 
+        'src/ble_peripheral_manager.mm', 
+        'src/objc_cpp.mm',
+        'src/callbacks.mm' 
+      ],
+      'include_dirs': [
+        "<!(node -p \"require('node-addon-api').include_dir\")",
+        "<!@(node -p \"require('napi-thread-safe-callback').include\")"
+      ],
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],
+      "defines": ["NAPI_CPP_EXCEPTIONS"],
       'xcode_settings': {
         'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
+        'MACOSX_DEPLOYMENT_TARGET': '10.13',
         'CLANG_CXX_LIBRARY': 'libc++',
-        'MACOSX_DEPLOYMENT_TARGET': '10.7',
         'OTHER_CFLAGS': [
-            '-fobjc-arc',
+          '-fobjc-arc',
+          '-arch x86_64',
+          '-arch arm64'
         ],
-      },
-      'link_settings': {
-        'libraries': [
-          '$(SDKROOT)/System/Library/Frameworks/CoreBluetooth.framework',
+        'OTHER_LDFLAGS': [
+          '-framework CoreBluetooth',
+          '-arch x86_64',
+          '-arch arm64'
         ]
-      },
-      'product_dir': '../lib/mac/native',
+      }
     }
   ]
 }

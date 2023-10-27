@@ -12,7 +12,7 @@
 
 @interface BLEPeripheralManager () <CBPeripheralManagerDelegate>
 
-@property (nonatomic, strong) __attribute__((NSObject)) dispatch_queue_t queue;
+@property (nonatomic, strong) dispatch_queue_t queue;
 @property (nonatomic, strong) CBPeripheralManager *peripheralManager;
 
 @end
