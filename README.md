@@ -5,7 +5,7 @@
 
 A Node.js module for implementing BLE (Bluetooth Low Energy) peripherals.
 
-Need a BLE central module? See [noble](https://github.com/abandonware/noble).
+Need a BLE central module? See [noble](https://github.com/stoprocent/noble).
 
 __Note:__ Starting with version 0.6 bleno is basing on ES6 classes and supports Node.js 14.x and higher only. For older versions of Node.js use bleno 0.5.x. 
 
@@ -116,7 +116,7 @@ Make sure you have read and write permissions on the ```/dev/usb/*``` device tha
 ## Install
 
 ```sh
-npm install bleno@npm:@abandonware/bleno
+npm install bleno@npm:@stoprocent/bleno
 ```
 
 ## Usage
@@ -125,7 +125,7 @@ npm install bleno@npm:@abandonware/bleno
 var bleno = require('bleno');
 ```
 
-See [examples folder](https://github.com/sandeepmistry/bleno/blob/master/examples) for code examples.
+See [examples folder](https://github.com/stoprocent/bleno/blob/master/examples) for code examples.
 
 ### Actions
 
