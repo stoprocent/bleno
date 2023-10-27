@@ -1,3 +1,1 @@
-const Bleno = require('./lib/bleno');
-
-module.exports = new Bleno();
+module.exports = require('./with-custom-binding')();

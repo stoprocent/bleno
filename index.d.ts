@@ -120,6 +120,8 @@ interface Bleno extends NodeJS.EventEmitter {
 
     disconnect(): void;
 
+    setAddress(address: string): void;
+
     setServices(services: ReadonlyArray<PrimaryService>, callback?: (arg: Error | undefined | null) => void): void;
 
     startAdvertising(name: string, serviceUuids?: ReadonlyArray<string>, callback?: (arg: Error | undefined | null) => void): void;

@@ -10,6 +10,7 @@ bleno.on('stateChange', function (state) {
   console.log('on -> stateChange: ' + state);
 
   if (state === 'poweredOn') {
+    bleno.setAddress('11:22:44:55:99:10');
     bleno.startAdvertising('echo', ['ec00']);
   } else {
     bleno.stopAdvertising();
