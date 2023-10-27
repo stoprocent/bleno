@@ -53,11 +53,12 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.6.0",
     "eslint-plugin-promise": "^6.1.1",
-    "should": "~13.2.3",
     "mocha": "~10.2.0",
     "node-blink1": "~0.5.1",
+    "nyc": "^15.1.0",
     "prebuildify": "^5.0.1",
-    "prebuildify-cross": "5.0.0"
+    "prebuildify-cross": "5.0.0",
+    "should": "~13.2.3"
 
   },
   "dependencies": {
