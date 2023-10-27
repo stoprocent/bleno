@@ -1,16 +1,16 @@
-var Blink1 = require('node-blink1');
+const Blink1 = require('node-blink1');
 
-var bleno = require('../..');
+const bleno = require('../..');
 
-var DeviceInformationService = require('./device-information-service');
-var Blink1Service = require('./blink1-service');
+const DeviceInformationService = require('./device-information-service');
+const Blink1Service = require('./blink1-service');
 
-var blink1 = new Blink1();
+const blink1 = new Blink1();
 
-var deviceInformationService = new DeviceInformationService(blink1);
-var blink1Service = new Blink1Service(blink1);
+const deviceInformationService = new DeviceInformationService(blink1);
+const blink1Service = new Blink1Service(blink1);
 
-bleno.on('stateChange', function(state) {
+bleno.on('stateChange', function (state) {
   console.log('on -> stateChange: ' + state);
 
   if (state === 'poweredOn') {
@@ -20,9 +20,9 @@ bleno.on('stateChange', function(state) {
   }
 });
 
-bleno.on('advertisingStart', function(error) {
+bleno.on('advertisingStart', function (error) {
   console.log('on -> advertisingStart: ' + (error ? 'error ' + error : 'success'));
-  
+
   if (!error) {
     bleno.setServices([
       deviceInformationService,

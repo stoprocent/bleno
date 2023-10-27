@@ -1,10 +1,10 @@
-var util = require('util');
+const util = require('util');
 
-var bleno = require('../..');
-var BlenoCharacteristic = bleno.Characteristic;
-var BlenoDescriptor = bleno.Descriptor;
+const bleno = require('../..');
+const BlenoCharacteristic = bleno.Characteristic;
+const BlenoDescriptor = bleno.Descriptor;
 
-function Blink1RGBCharacteristic(blink1) {
+function Blink1RGBCharacteristic (blink1) {
   Blink1RGBCharacteristic.super_.call(this, {
     uuid: '01010101010101010101010101524742',
     properties: ['write', 'writeWithoutResponse'],
@@ -21,17 +21,17 @@ function Blink1RGBCharacteristic(blink1) {
 
 util.inherits(Blink1RGBCharacteristic, BlenoCharacteristic);
 
-Blink1RGBCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResponse, callback) {
+Blink1RGBCharacteristic.prototype.onWriteRequest = function (data, offset, withoutResponse, callback) {
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG);
   } else if (data.length !== 3) {
     callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH);
   } else {
-    var r = data.readUInt8(0);
-    var g = data.readUInt8(1);
-    var b = data.readUInt8(2);
+    const r = data.readUInt8(0);
+    const g = data.readUInt8(1);
+    const b = data.readUInt8(2);
 
-    this.blink1.setRGB(r, g, b, function() {
+    this.blink1.setRGB(r, g, b, function () {
       callback(this.RESULT_SUCCESS);
     }.bind(this));
   }

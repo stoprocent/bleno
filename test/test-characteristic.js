@@ -4,24 +4,24 @@ const should = require('should');
 
 const Characteristic = require('../lib/characteristic');
 
-describe('Characteristic', function() {
+describe('Characteristic', function () {
   const mockUuid = 'mockuuid';
   const mockProperties = ['property1', 'property2', 'property3'];
   const mockSecure = ['secure1', 'secure2', 'secure3'];
   const mockValue = Buffer.from('mock value');
   const mockDescriptors = [{}, {}, {}];
 
-  const mockOnReadRequest = function() {};
-  const mockOnWriteRequest = function() {};
-  const mockOnSubscribe = function() {};
-  const mockOnUnsubscribe = function() {};
-  const mockOnNotify = function() {};
-  const mockOnIndicate = function() {};
+  const mockOnReadRequest = function () {};
+  const mockOnWriteRequest = function () {};
+  const mockOnSubscribe = function () {};
+  const mockOnUnsubscribe = function () {};
+  const mockOnNotify = function () {};
+  const mockOnIndicate = function () {};
 
   const mockMaxValueSize = 20;
-  const mockUpdateValueCallback = function() {};
+  const mockUpdateValueCallback = function () {};
 
-  it('should create with uuid option', function() {
+  it('should create with uuid option', function () {
     const characteristic = new Characteristic({
       uuid: mockUuid
     });
@@ -40,7 +40,7 @@ describe('Characteristic', function() {
     characteristic.descriptors.length.should.equal(0);
   });
 
-  it('should create with properties option', function() {
+  it('should create with properties option', function () {
     const characteristic = new Characteristic({
       properties: mockProperties
     });
@@ -48,7 +48,7 @@ describe('Characteristic', function() {
     characteristic.properties.should.equal(mockProperties);
   });
 
-  it('should create with secure option', function() {
+  it('should create with secure option', function () {
     const characteristic = new Characteristic({
       secure: mockSecure
     });
@@ -56,7 +56,7 @@ describe('Characteristic', function() {
     characteristic.secure.should.equal(mockSecure);
   });
 
-  it('should create with value option', function() {
+  it('should create with value option', function () {
     const characteristic = new Characteristic({
       properties: ['read'],
       value: mockValue
@@ -65,8 +65,9 @@ describe('Characteristic', function() {
     characteristic.value.should.equal(mockValue);
   });
 
-  it('should not create with value option and non-read properties', function() {
-    (function(){
+  it('should not create with value option and non-read properties', function () {
+    (function () {
+      // eslint-disable-next-line no-unused-vars
       const characteristic = new Characteristic({
         properties: ['write'],
         value: mockValue
@@ -74,7 +75,7 @@ describe('Characteristic', function() {
     }).should.throw();
   });
 
-  it('should create with descriptors option', function() {
+  it('should create with descriptors option', function () {
     const characteristic = new Characteristic({
       descriptors: mockDescriptors
     });
@@ -82,7 +83,7 @@ describe('Characteristic', function() {
     characteristic.descriptors.should.equal(mockDescriptors);
   });
 
-  it('should create with onReadRequest option', function() {
+  it('should create with onReadRequest option', function () {
     const characteristic = new Characteristic({
       onReadRequest: mockOnReadRequest
     });
@@ -90,7 +91,7 @@ describe('Characteristic', function() {
     characteristic.onReadRequest.should.equal(mockOnReadRequest);
   });
 
-  it('should create with onWriteRequest option', function() {
+  it('should create with onWriteRequest option', function () {
     const characteristic = new Characteristic({
       onWriteRequest: mockOnWriteRequest
     });
@@ -98,7 +99,7 @@ describe('Characteristic', function() {
     characteristic.onWriteRequest.should.equal(mockOnWriteRequest);
   });
 
-  it('should create with onSubscribe option', function() {
+  it('should create with onSubscribe option', function () {
     const characteristic = new Characteristic({
       onSubscribe: mockOnSubscribe
     });
@@ -106,7 +107,7 @@ describe('Characteristic', function() {
     characteristic.onSubscribe.should.equal(mockOnSubscribe);
   });
 
-  it('should create with onUnsubscribe option', function() {
+  it('should create with onUnsubscribe option', function () {
     const characteristic = new Characteristic({
       onUnsubscribe: mockOnUnsubscribe
     });
@@ -114,7 +115,7 @@ describe('Characteristic', function() {
     characteristic.onUnsubscribe.should.equal(mockOnUnsubscribe);
   });
 
-  it('should create with onNotify option', function() {
+  it('should create with onNotify option', function () {
     const characteristic = new Characteristic({
       onNotify: mockOnNotify
     });
@@ -122,15 +123,15 @@ describe('Characteristic', function() {
     characteristic.onNotify.should.equal(mockOnNotify);
   });
 
-  it('should create with onIndicate option', function() {
+  it('should create with onIndicate option', function () {
     const characteristic = new Characteristic({
-    onIndicate: mockOnIndicate
-  });
+      onIndicate: mockOnIndicate
+    });
 
     characteristic.onIndicate.should.equal(mockOnIndicate);
   });
 
-  it('should toString', function() {
+  it('should toString', function () {
     const characteristic = new Characteristic({
       uuid: mockUuid
     });
@@ -138,10 +139,10 @@ describe('Characteristic', function() {
     characteristic.toString().should.equal('{"uuid":"mockuuid","properties":[],"secure":[],"value":null,"descriptors":[]}');
   });
 
-  it('should handle read request', function(done) {
+  it('should handle read request', function (done) {
     const characteristic = new Characteristic({});
 
-    characteristic.emit('readRequest', 0, function(result, data) {
+    characteristic.emit('readRequest', 0, function (result, data) {
       result.should.equal(0x0e);
       should(data).equal(null);
 
@@ -149,17 +150,17 @@ describe('Characteristic', function() {
     });
   });
 
-  it('should handle write request', function(done) {
+  it('should handle write request', function (done) {
     const characteristic = new Characteristic({});
 
-    characteristic.emit('writeRequest', Buffer.alloc(0), 0, false, function(result) {
+    characteristic.emit('writeRequest', Buffer.alloc(0), 0, false, function (result) {
       result.should.equal(0x0e);
 
       done();
     });
   });
 
-  it('should handle unsubscribe', function() {
+  it('should handle unsubscribe', function () {
     const characteristic = new Characteristic({});
 
     characteristic.maxValueSize = mockMaxValueSize;

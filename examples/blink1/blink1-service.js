@@ -1,12 +1,12 @@
-var util = require('util');
+const util = require('util');
 
-var bleno = require('../..');
-var BlenoPrimaryService = bleno.PrimaryService;
+const bleno = require('../..');
+const BlenoPrimaryService = bleno.PrimaryService;
 
-var Blink1RGBCharacteristic = require('./blink1-rgb-characteristic');
-var Blink1FadeRGBCharacteristic = require('./blink1-fade-rgb-characteristic');
+const Blink1RGBCharacteristic = require('./blink1-rgb-characteristic');
+const Blink1FadeRGBCharacteristic = require('./blink1-fade-rgb-characteristic');
 
-function Blink1Service(blink1) {
+function Blink1Service (blink1) {
   Blink1Service.super_.call(this, {
     uuid: '01010101010101010101010101010101',
     characteristics: [

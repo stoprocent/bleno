@@ -1,11 +1,11 @@
-var util = require('util');
+const util = require('util');
 
-var bleno = require('../..');
+const bleno = require('../..');
 
-var BlenoCharacteristic = bleno.Characteristic;
-var BlenoDescriptor = bleno.Descriptor;
+const BlenoCharacteristic = bleno.Characteristic;
+const BlenoDescriptor = bleno.Descriptor;
 
-function SerialNumberCharacteristic(blink1) {
+function SerialNumberCharacteristic (blink1) {
   SerialNumberCharacteristic.super_.call(this, {
     uuid: '2a25',
     properties: ['read'],

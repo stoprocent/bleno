@@ -1,8 +1,7 @@
-var util = require('util');
-var bleno = require('../..');
-var pizza = require('./pizza');
+const util = require('util');
+const bleno = require('../..');
 
-function PizzaBakeCharacteristic(pizza) {
+function PizzaBakeCharacteristic (pizza) {
   bleno.Characteristic.call(this, {
     uuid: '13333333333333333333333333330003',
     properties: ['notify', 'write'],
@@ -19,19 +18,17 @@ function PizzaBakeCharacteristic(pizza) {
 
 util.inherits(PizzaBakeCharacteristic, bleno.Characteristic);
 
-PizzaBakeCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResponse, callback) {
+PizzaBakeCharacteristic.prototype.onWriteRequest = function (data, offset, withoutResponse, callback) {
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG);
-  }
-  else if (data.length !== 2) {
+  } else if (data.length !== 2) {
     callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH);
-  }
-  else {
-    var temperature = data.readUInt16BE(0);
-    var self = this;
-    this.pizza.once('ready', function(result) {
+  } else {
+    const temperature = data.readUInt16BE(0);
+    const self = this;
+    this.pizza.once('ready', function (result) {
       if (self.updateValueCallback) {
-        var data = Buffer.alloc(1);
+        const data = Buffer.alloc(1);
         data.writeUInt8(result, 0);
         self.updateValueCallback(data);
       }

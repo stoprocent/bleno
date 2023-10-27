@@ -1,12 +1,12 @@
-var util = require('util');
+const util = require('util');
 
-var bleno = require('../..');
-var BlenoPrimaryService = bleno.PrimaryService;
+const bleno = require('../..');
+const BlenoPrimaryService = bleno.PrimaryService;
 
-var SerialNumberCharacteristic = require('./serial-number-characteristic');
-var HardwareRevisionCharacteristic = require('./hardware-revision-characteristic');
+const SerialNumberCharacteristic = require('./serial-number-characteristic');
+const HardwareRevisionCharacteristic = require('./hardware-revision-characteristic');
 
-function DeviceInformationService(blink1) {
+function DeviceInformationService (blink1) {
   DeviceInformationService.super_.call(this, {
     uuid: '180a',
     characteristics: [

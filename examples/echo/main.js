@@ -1,12 +1,12 @@
-var bleno = require('../..');
+const bleno = require('../..');
 
-var BlenoPrimaryService = bleno.PrimaryService;
+const BlenoPrimaryService = bleno.PrimaryService;
 
-var EchoCharacteristic = require('./characteristic');
+const EchoCharacteristic = require('./characteristic');
 
 console.log('bleno - echo');
 
-bleno.on('stateChange', function(state) {
+bleno.on('stateChange', function (state) {
   console.log('on -> stateChange: ' + state);
 
   if (state === 'poweredOn') {
@@ -16,7 +16,7 @@ bleno.on('stateChange', function(state) {
   }
 });
 
-bleno.on('advertisingStart', function(error) {
+bleno.on('advertisingStart', function (error) {
   console.log('on -> advertisingStart: ' + (error ? 'error ' + error : 'success'));
 
   if (!error) {

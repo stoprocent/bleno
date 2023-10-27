@@ -1,14 +1,11 @@
 /* jshint mocha: true */
+const PrimaryService = require('../lib/primary-service');
 
-var should = require('should');
-
-var PrimaryService = require('../lib/primary-service');
-
-describe('PrimaryService', function() {
+describe('PrimaryService', function () {
   const mockUuid = 'mockuuid';
   const mockCharacteristics = [{}, {}, {}];
 
-  it('should create with uuid option', function() {
+  it('should create with uuid option', function () {
     const service = new PrimaryService({
       uuid: mockUuid
     });
@@ -19,7 +16,7 @@ describe('PrimaryService', function() {
     service.characteristics.length.should.equal(0);
   });
 
-  it('should create with characteristics option', function() {
+  it('should create with characteristics option', function () {
     const service = new PrimaryService({
       characteristics: mockCharacteristics
     });
@@ -27,7 +24,7 @@ describe('PrimaryService', function() {
     service.characteristics.should.equal(mockCharacteristics);
   });
 
-  it('should toString', function() {
+  it('should toString', function () {
     const service = new PrimaryService({
       uuid: mockUuid
     });

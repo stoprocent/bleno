@@ -2,7 +2,7 @@ const bleno = require('./index');
 
 console.log('bleno - iBeacon');
 
-bleno.on('stateChange', function(state) {
+bleno.on('stateChange', function (state) {
   console.log('on -> stateChange: ' + state);
 
   if (state === 'poweredOn') {
@@ -12,10 +12,10 @@ bleno.on('stateChange', function(state) {
   }
 });
 
-bleno.on('advertisingStart', function() {
+bleno.on('advertisingStart', function () {
   console.log('on -> advertisingStart');
 });
 
-bleno.on('advertisingStop', function() {
+bleno.on('advertisingStop', function () {
   console.log('on -> advertisingStop');
 });
