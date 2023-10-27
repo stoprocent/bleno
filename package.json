@@ -45,6 +45,7 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "@semantic-release/exec": "^6.0.3",
+    "cross-env": "^7.0.3",
     "jshint": "~2.13.6",
     "eslint": "^8.31.0",
     "eslint-config-semistandard": "^17.0.0",
