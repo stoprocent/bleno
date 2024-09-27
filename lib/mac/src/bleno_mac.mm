@@ -46,7 +46,7 @@ BlenoMac::BlenoMac(const Napi::CallbackInfo& info) : ObjectWrap(info) {
 }
 
 Napi::Value BlenoMac::Init(const Napi::CallbackInfo& info) {
-    NSLog(@"BlenoMac::Init");
+    // NSLog(@"BlenoMac::Init");
 
     Napi::Function emit = info.This().As<Napi::Object>().Get("emit").As<Napi::Function>();
     peripheralManager = [BLEPeripheralManager new];
@@ -64,7 +64,7 @@ Napi::Value BlenoMac::CleanUp(const Napi::CallbackInfo& info) {
 
 // startAdvertising(name, undashedServiceUuids)
 Napi::Value BlenoMac::StartAdvertising(const Napi::CallbackInfo& info) {
-    NSLog(@"BlenoMac::StartAdvertising");
+    // NSLog(@"BlenoMac::StartAdvertising");
 
     CHECK_MANAGER();
     ARG2(String, Array);
@@ -80,28 +80,28 @@ Napi::Value BlenoMac::StartAdvertising(const Napi::CallbackInfo& info) {
 
 // startAdvertisingIBeacon(iBeaconData)
 Napi::Value BlenoMac::StartAdvertisingIBeacon(const Napi::CallbackInfo& info) {
-    NSLog(@"BlenoMac::StartAdvertisingIBeacon");
+    // NSLog(@"BlenoMac::StartAdvertisingIBeacon");
 
     return Napi::Value();
 }
 
 // startAdvertisingWithEIRData(advertisementData, scanData)
 Napi::Value BlenoMac::StartAdvertisingWithEIRData(const Napi::CallbackInfo& info) {
-    NSLog(@"BlenoMac::StartAdvertisingWithEIRData");
+    // NSLog(@"BlenoMac::StartAdvertisingWithEIRData");
 
     return Napi::Value();
 }
 
 // stopAdvertising()
 Napi::Value BlenoMac::StopAdvertising(const Napi::CallbackInfo& info) {
-    NSLog(@"BlenoMac::StopAdvertising");
+    // NSLog(@"BlenoMac::StopAdvertising");
 
     return Napi::Value();
 }
 
 // setServices(services)
 Napi::Value BlenoMac::SetServices(const Napi::CallbackInfo& info) {
-    NSLog(@"BlenoMac::SetServices");
+    // NSLog(@"BlenoMac::SetServices");
 
     CHECK_MANAGER();
     ARG1(Array);
@@ -131,14 +131,14 @@ Napi::Value BlenoMac::SetServices(const Napi::CallbackInfo& info) {
 
 // disconnect()
 Napi::Value BlenoMac::Disconnect(const Napi::CallbackInfo& info) {
-    NSLog(@"BlenoMac::Disconnect");
+    // NSLog(@"BlenoMac::Disconnect");
 
     return Napi::Value();
 }
 
 // updateRssi()
 Napi::Value BlenoMac::UpdateRssi(const Napi::CallbackInfo& info) {
-    NSLog(@"BlenoMac::UpdateRssi");
+    // NSLog(@"BlenoMac::UpdateRssi");
 
     return Napi::Value();
 }

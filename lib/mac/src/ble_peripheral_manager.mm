@@ -21,7 +21,7 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        NSLog(@"-[BLEPeripheralManager init]");
+        // NSLog(@"-[BLEPeripheralManager init]");
 
         self.queue = dispatch_queue_create("CBqueue", 0);
     }
@@ -36,7 +36,7 @@
 }
 
 - (void)startAdvertising:(nonnull NSString *)name serviceUUIDs:(nonnull NSArray<CBUUID *> *)serviceUUIDs {
-    NSLog(@"startAdvertising:%@ serviceUUIDs:%@", name, serviceUUIDs);
+    // NSLog(@"startAdvertising:%@ serviceUUIDs:%@", name, serviceUUIDs);
     if (self.peripheralManager.isAdvertising) {
         return;
     }
@@ -48,11 +48,11 @@
 }
 
 - (void)startAdvertisingIBeacon:(NSData *)data {
-    NSLog(@"startAdvertisingIBeacon:%@", data);
+    // NSLog(@"startAdvertisingIBeacon:%@", data);
 }
 
 - (void)startAdvertisingWithEIRData:(NSData *)data {
-    NSLog(@"startAdvertisingWithEIRData:%@", data);
+    // NSLog(@"startAdvertisingWithEIRData:%@", data);
 
     if (self.peripheralManager.isAdvertising) {
         return;
@@ -60,7 +60,7 @@
 }
 
 - (void)stopAdvertising {
-    NSLog(@"stopAdvertising");
+    // NSLog(@"stopAdvertising");
 
     [self.peripheralManager stopAdvertising];
 }
@@ -72,13 +72,13 @@
 }
 
 - (void)disconnect {
-    NSLog(@"disconnect");
+    // NSLog(@"disconnect");
 
     // throw new Error('disconnect is not supported on OS X!');
 }
 
 - (void)updateRssi {
-    NSLog(@"updateRssi");
+    // NSLog(@"updateRssi");
 }
 
 #pragma mark - CBPeripheralManagerDelegate
@@ -111,36 +111,36 @@
             break;
     }
 
-    NSLog(@"%@", string);
+    // NSLog(@"%@", string);
 
     auto state = StringFromCBPeripheralState(peripheral.state);
     emit.StateChange(state);
 }
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral willRestoreState:(NSDictionary<NSString *, id> *)dict {
-    NSLog(@"willRestoreState");
+    // NSLog(@"willRestoreState");
 }
 
 - (void)peripheralManagerDidStartAdvertising:(CBPeripheralManager *)peripheral error:(nullable NSError *)error {
-    NSLog(@"peripheralManagerDidStartAdvertising: %@", peripheral.description);
+    // NSLog(@"peripheralManagerDidStartAdvertising: %@", peripheral.description);
     if (error) {
-        NSLog(@"Error advertising: %@", [error localizedDescription]);
+        // NSLog(@"Error advertising: %@", [error localizedDescription]);
     }
 
     emit.AdvertisingStart();
 }
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didAddService:(CBService *)service error:(nullable NSError *)error {
-    NSLog(@"peripheralManagerDidAddService: %@ %@", service, error);
+    // NSLog(@"peripheralManagerDidAddService: %@ %@", service, error);
     if (error) {
-        NSLog(@"Error publishing service: %@", [error localizedDescription]);
+        // NSLog(@"Error publishing service: %@", [error localizedDescription]);
     }
 
     emit.ServicesSet();
 }
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral central:(CBCentral *)central didSubscribeToCharacteristic:(CBMutableCharacteristic *)characteristic {
-    NSLog(@"didSubscribeToCharacteristic");
+    // NSLog(@"didSubscribeToCharacteristic");
 
     CBUUID *uuid = characteristic.UUID;
 
@@ -164,7 +164,7 @@
 }
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral central:(CBCentral *)central didUnsubscribeFromCharacteristic:(CBCharacteristic *)characteristic {
-    NSLog(@"didUnsubscribeFromCharacteristic");
+    // NSLog(@"didUnsubscribeFromCharacteristic");
 
     CBUUID *uuid = characteristic.UUID;
 
@@ -176,7 +176,7 @@
 }
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveReadRequest:(CBATTRequest *)request {
-    NSLog(@"didReceiveReadRequest: %@ %@", request.central, request.characteristic.UUID);
+    // NSLog(@"didReceiveReadRequest: %@ %@", request.central, request.characteristic.UUID);
 
     CBCharacteristic *characteristic = request.characteristic;
     CBUUID *uuid = characteristic.UUID;
@@ -197,7 +197,7 @@
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveWriteRequests:(NSArray<CBATTRequest *> *)requests {
     for (CBATTRequest *request in requests) {
-        NSLog(@"didReceiveWriteRequest: %@ %@", request.central, request.characteristic.UUID);
+        // NSLog(@"didReceiveWriteRequest: %@ %@", request.central, request.characteristic.UUID);
 
         CBCharacteristic *characteristic = request.characteristic;
         CBUUID *uuid = characteristic.UUID;
@@ -223,19 +223,19 @@
 }
 
 - (void)peripheralManagerIsReadyToUpdateSubscribers:(CBPeripheralManager *)peripheral {
-    NSLog(@"peripheralManagerIsReadyToUpdateSubscribers");
+    // NSLog(@"peripheralManagerIsReadyToUpdateSubscribers");
 }
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didPublishL2CAPChannel:(CBL2CAPPSM)PSM error:(nullable NSError *)error {
-    NSLog(@"didPublishL2CAPChannel");
+    // NSLog(@"didPublishL2CAPChannel");
 }
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didUnpublishL2CAPChannel:(CBL2CAPPSM)PSM error:(nullable NSError *)error {
-    NSLog(@"didUnpublishL2CAPChannel");
+    // NSLog(@"didUnpublishL2CAPChannel");
 }
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didOpenL2CAPChannel:(nullable CBL2CAPChannel *)channel error:(nullable NSError *)error {
-    NSLog(@"didOpenL2CAPChannel");
+    // NSLog(@"didOpenL2CAPChannel");
 }
 
 @end

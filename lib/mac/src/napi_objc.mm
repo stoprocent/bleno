@@ -41,7 +41,7 @@ NSNumber* napiToNumber(Napi::Number number) {
 }
 
 NSArray<CBMutableService *> *napiArrayToCBMutableServices(Napi::Array array) {
-    NSLog(@"napiArrayToCBMutableServices");
+    // NSLog(@"napiArrayToCBMutableServices");
 
     NSMutableArray *services = [NSMutableArray array];
 
@@ -56,11 +56,11 @@ NSArray<CBMutableService *> *napiArrayToCBMutableServices(Napi::Array array) {
 }
 
 CBMutableService *napiToCBMutableService(Napi::Object obj) {
-    NSLog(@"napiToCBMutableService");
+    // NSLog(@"napiToCBMutableService");
 
     NSString *uuid = napiToUuidString(obj.Get("uuid").ToString());
 
-    NSLog(@"napiArrayToCBMutableService: uuid:%@", uuid);
+    // NSLog(@"napiArrayToCBMutableService: uuid:%@", uuid);
 
     CBMutableService *service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:uuid]
                                                                primary:YES];
@@ -73,7 +73,7 @@ CBMutableService *napiToCBMutableService(Napi::Object obj) {
 
 
 NSArray<CBMutableCharacteristic *> *napiArrayToCBMutableCharacteristics(Napi::Array array) {
-    NSLog(@"napiArrayToCBMutableCharacteristics");
+    // NSLog(@"napiArrayToCBMutableCharacteristics");
 
     NSMutableArray *characteristics = [NSMutableArray array];
 
@@ -88,13 +88,13 @@ NSArray<CBMutableCharacteristic *> *napiArrayToCBMutableCharacteristics(Napi::Ar
 }
 
 CBMutableCharacteristic *napiToCBMutableCharacteristic(Napi::Object obj) {
-    NSLog(@"napiToCBMutableCharacteristic");
+    // NSLog(@"napiToCBMutableCharacteristic");
 
     NSString *uuid = napiToUuidString(obj.Get("uuid").ToString());
-    NSLog(@"napiToCBMutableCharacteristic: cUUID:%@", uuid);
+    // NSLog(@"napiToCBMutableCharacteristic: cUUID:%@", uuid);
 
     NSData *value = obj.Get("value").IsBuffer() ? napiToData(obj.Get("value").As<Napi::Buffer<Byte>>()) : nil;
-    NSLog(@"napiToCBMutableCharacteristic: value:%@", value);
+    // NSLog(@"napiToCBMutableCharacteristic: value:%@", value);
 
     auto properties = obj.Get("properties").As<Napi::Array>();
     auto secure = obj.Get("secure").As<Napi::Array>();
@@ -112,7 +112,7 @@ CBMutableCharacteristic *napiToCBMutableCharacteristic(Napi::Object obj) {
 }
 
 CBCharacteristicProperties napiToCBCharacteristicProperties(Napi::Array properties, Napi::Array secure) {
-    NSLog(@"napiToCBCharacteristicProperties");
+    // NSLog(@"napiToCBCharacteristicProperties");
 
     NSArray<NSString *> *p = napiToStringArray(properties);
     NSArray<NSString *> *s = napiToStringArray(secure);
@@ -151,7 +151,7 @@ CBCharacteristicProperties napiToCBCharacteristicProperties(Napi::Array properti
 }
 
 CBAttributePermissions napiToCBAttributePermissions(Napi::Array properties, Napi::Array secure) {
-    NSLog(@"napiToCBAttributePermissions");
+    // NSLog(@"napiToCBAttributePermissions");
 
     NSArray<NSString *> *p = napiToStringArray(properties);
     NSArray<NSString *> *s = napiToStringArray(secure);
@@ -186,7 +186,7 @@ CBAttributePermissions napiToCBAttributePermissions(Napi::Array properties, Napi
 }
 
 NSArray<CBDescriptor *> *napiArrayToCBDescriptors(Napi::Array array) {
-    NSLog(@"napiArrayToCBDescriptors");
+    // NSLog(@"napiArrayToCBDescriptors");
 
     NSMutableArray *descriptors = [NSMutableArray array];
 
@@ -204,7 +204,7 @@ CBDescriptor *napiToCBDescriptor(Napi::Object obj) {
     NSString *uuid = napiToUuidString(obj.Get("uuid").ToString());
     NSString *value = napiToString(obj.Get("value").ToString());
 
-    NSLog(@"napiToCBDescriptor uuid:%@ value:%@", uuid, value);
+    // NSLog(@"napiToCBDescriptor uuid:%@ value:%@", uuid, value);
 
     return [[CBMutableDescriptor alloc] initWithType:[CBUUID UUIDWithString:uuid]
                                                value:value];
@@ -224,7 +224,7 @@ NSArray<NSString *> *napiToStringArray(Napi::Array array) {
 }
 
 std::map<Napi::String, Napi::Object> napiArrayToUUIDEmitters(Napi::Array services) {
-    NSLog(@"napiArrayToUUIDEmitters");
+    // NSLog(@"napiArrayToUUIDEmitters");
 
     std::map<Napi::String, Napi::Object> map;
 
