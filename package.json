@@ -68,8 +68,7 @@
     "debug": "^4.3.7",
     "napi-thread-safe-callback": "^0.0.6",
     "node-addon-api": "^8.1.0",
-    "node-gyp-build": "^4.8.1",
-    "patch-package": "^8.0.0"
+    "node-gyp-build": "^4.8.1"
   },
   "optionalDependencies": {
     "@stoprocent/bluetooth-hci-socket": "^1.3.0",
