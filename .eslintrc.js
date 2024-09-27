@@ -1,13 +1,14 @@
 module.exports = {
   root: true,
-  extends: ['eslint:recommended', 'semistandard'],
+  extends: ['eslint:recommended'],
   parserOptions: {
     ecmaVersion: 2017
   },
   env: {
     browser: true,
     mocha: true,
-    node: true
+    node: true,
+    es6: true
   },
   globals: {
     Promise: true
