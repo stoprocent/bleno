@@ -1,4 +1,4 @@
-const bleno = require('./index');
+const bleno = require('../../index');
 
 const BlenoPrimaryService = bleno.PrimaryService;
 const BlenoCharacteristic = bleno.Characteristic;
