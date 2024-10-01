@@ -1,15 +1,52 @@
 # bleno
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sandeepmistry/bleno?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+[![GitHub forks](
+https://img.shields.io/github/forks/stoprocent/bleno.svg?style=social&label=Fork&maxAge=2592000
+)](
+https://GitHub.com/stoprocent/bleno/network/
+)
+[![license](
+https://img.shields.io/badge/license-MIT-0.svg
+)](MIT)
+[![NPM](
+https://img.shields.io/npm/v/@stoprocent/bleno.svg
+)](
+https://www.npmjs.com/package/@stoprocent/bleno
+)
 
 A Node.js module for implementing BLE (Bluetooth Low Energy) peripherals.
 
 Need a BLE central module? See [noble](https://github.com/stoprocent/noble).
 
-__Note:__ Starting with version 0.6 bleno is basing on ES6 classes and supports Node.js 14.x and higher only. For older versions of Node.js use bleno 0.5.x. 
+## About This Fork
 
-__Note:__ macOS / Mac OS X, Linux, FreeBSD and Windows are currently the only supported OSes.
+This fork of `bleno` was created to introduce several key improvements and new features:
+
+1. **HCI UART Support**: This version enables HCI UART communication through the `@stoprocent/node-bluetooth-hci-socket` dependency, allowing more flexible use of Bluetooth devices across platforms.
+   
+2. **macOS Native Bindings Fix**: I have fixed the native bindings for macOS, ensuring better compatibility and performance on Apple devices.
+
+3. **New Features**: A `setAddress` function has been added, allowing users to set the MAC address of the peripheral device. Additionally, I plan to add raw L2CAP channel support, enhancing low-level Bluetooth communication capabilities.
+
+If you appreciate these enhancements and the continued development of this project, please consider supporting my work. 
+
+[![Buy me a coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/stoprocent)
+
+
+## Install
+
+```sh
+npm install bleno@npm:@stoprocent/bleno
+```
+
+## Usage
+
+```javascript
+const bleno = require('@stoprocent/bleno');
+```
+
+See [examples folder](https://github.com/stoprocent/bleno/blob/master/examples) for code examples.
+
 
 ## Prerequisites
 
@@ -112,20 +149,6 @@ Make sure you have read and write permissions on the ```/dev/usb/*``` device tha
  * [node-bluetooth-hci-socket prerequisites](https://github.com/sandeepmistry/node-bluetooth-hci-socket#windows)
    * Compatible Bluetooth 4.0 USB adapter
    * [WinUSB](https://msdn.microsoft.com/en-ca/library/windows/hardware/ff540196(v=vs.85).aspx) driver setup for Bluetooth 4.0 USB adapter, using [Zadig tool](http://zadig.akeo.ie/)
-
-## Install
-
-```sh
-npm install bleno@npm:@stoprocent/bleno
-```
-
-## Usage
-
-```javascript
-var bleno = require('bleno');
-```
-
-See [examples folder](https://github.com/stoprocent/bleno/blob/master/examples) for code examples.
 
 ### Actions
 
