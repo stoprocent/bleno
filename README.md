@@ -16,7 +16,7 @@ https://www.npmjs.com/package/@stoprocent/bleno
 
 A Node.js module for implementing BLE (Bluetooth Low Energy) peripherals.
 
-Need a BLE central module? See [noble](https://github.com/stoprocent/noble).
+Need a BLE central module? See [@stoprocent/noble](https://github.com/stoprocent/noble).
 
 ## About This Fork
 
@@ -36,7 +36,7 @@ If you appreciate these enhancements and the continued development of this proje
 ## Install
 
 ```sh
-npm install bleno@npm:@stoprocent/bleno
+npm install @stoprocent/bleno --save
 ```
 
 ## Usage
