@@ -103,7 +103,7 @@ declare class PrimaryService {
     toString(): string;
 }
 
-interface Bleno extends NodeJS.EventEmitter {
+export interface Bleno extends NodeJS.EventEmitter {
     readonly Characteristic: typeof Characteristic;
     readonly Descriptor: typeof Descriptor;
     readonly PrimaryService: typeof PrimaryService;
@@ -119,6 +119,8 @@ interface Bleno extends NodeJS.EventEmitter {
     readonly state: State;
 
     disconnect(): void;
+
+    stop(): void;
 
     setAddress(address: string): void;
 

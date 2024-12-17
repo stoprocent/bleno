@@ -228,6 +228,12 @@ Napi::Value BlenoMac::CleanUp(const Napi::CallbackInfo& info) {
     return Napi::Value();
 }
 
+Napi::Value BlenoMac::Stop(const Napi::CallbackInfo& info) {
+    CHECK_MANAGER()
+    CleanUp(info);
+    return Napi::Value();
+}
+
 Napi::Function BlenoMac::GetClass(Napi::Env env) {
     return DefineClass(env, "BlenoMac", {
         BlenoMac::InstanceMethod("init", &BlenoMac::Init),
@@ -248,6 +254,7 @@ Napi::Function BlenoMac::GetClass(Napi::Env env) {
         BlenoMac::InstanceMethod("readHandle", &BlenoMac::ReadValue),
         BlenoMac::InstanceMethod("writeHandle", &BlenoMac::WriteValue),
         BlenoMac::InstanceMethod("cleanUp", &BlenoMac::CleanUp),
+        BlenoMac::InstanceMethod("stop", &BlenoMac::Stop),
     });
 }
 
