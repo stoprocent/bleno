@@ -137,6 +137,29 @@ export interface Bleno extends NodeJS.EventEmitter {
 
     updateRssi(callback?: (err: null, rssi: number) => void): void;
 
+    // Async methods
+    waitForPoweredOn(timeout?: number): Promise<void>;
+
+    setAddressAsync(address: string): Promise<void>;
+    
+    setServicesAsync(services: ReadonlyArray<PrimaryService>): Promise<void>;
+    
+    startAdvertisingAsync(name: string, serviceUuids?: ReadonlyArray<string>): Promise<void>;
+    
+    startAdvertisingIBeaconAsync(
+        uuid: string,
+        major: number,
+        minor: number,
+        measuredPower: number
+    ): Promise<void>;
+    
+    startAdvertisingWithEIRDataAsync(advertisementData: Buffer): Promise<void>;
+    startAdvertisingWithEIRDataAsync(advertisementData: Buffer, scanData: Buffer): Promise<void>;
+    
+    stopAdvertisingAsync(): Promise<void>;
+    
+    updateRssiAsync(): Promise<number>;
+
     on(event: 'stateChange', cb: (state: State) => void): this;
     on(event: 'platform', cb: (platform: NodeJS.Platform) => void): this;
     on(event: 'addressChange', cb: (address: string) => void): this;
