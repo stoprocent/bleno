@@ -11,34 +11,34 @@ class EchoCharacteristic extends BlenoCharacteristic {
     });
 
     this._value = Buffer.alloc(0);
-    this._updateValueCallback = null;
+    this._updateValueCallbacks = new Map();
   }
 
-  onReadRequest (offset, callback) {
+  onReadRequest (connection, offset, callback) {
     console.log('EchoCharacteristic - onReadRequest: value = ' + this._value.toString('hex'));
     callback(this.RESULT_SUCCESS, this._value);
   }
 
-  onWriteRequest (data, offset, withoutResponse, callback) {
+  onWriteRequest (connection, data, offset, withoutResponse, callback) {
     this._value = data;
     console.log('EchoCharacteristic - onWriteRequest: value = ' + this._value.toString('hex'));
 
-    if (this._updateValueCallback) {
+    for (const updateValueCallback of this._updateValueCallbacks.values()) {
       console.log('EchoCharacteristic - onWriteRequest: notifying');
-      this._updateValueCallback(this._value);
+      updateValueCallback(this._value);
     }
 
     callback(this.RESULT_SUCCESS);
   }
 
-  onSubscribe (maxValueSize, updateValueCallback) {
+  onSubscribe (connection, maxValueSize, updateValueCallback) {
     console.log('EchoCharacteristic - onSubscribe');
-    this._updateValueCallback = updateValueCallback;
+    this._updateValueCallbacks.set(connection, updateValueCallback);
   }
 
-  onUnsubscribe () {
+  onUnsubscribe (connection) {
     console.log('EchoCharacteristic - onUnsubscribe');
-    this._updateValueCallback = null;
+    this._updateValueCallbacks.delete(connection);
   }
 }
 
