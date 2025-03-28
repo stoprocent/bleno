@@ -13,6 +13,7 @@
 @interface BLEPeripheralManager () <CBPeripheralManagerDelegate>
 
 @property (nonatomic, strong) dispatch_queue_t queue;
+@property (nonatomic, strong) NSMutableArray<NSDictionary *> *pendingNotifications;
 @property (nonatomic, strong) CBPeripheralManager *peripheralManager;
 
 @end
@@ -22,10 +23,30 @@
 - (instancetype)init {
     if (self = [super init]) {
         // NSLog(@"-[BLEPeripheralManager init]");
-
-        self.queue = dispatch_queue_create("CBqueue", 0);
+        self.queue = dispatch_queue_create("CBqueue", DISPATCH_QUEUE_SERIAL);
+        self.pendingNotifications = [NSMutableArray array];
     }
     return self;
+}
+
+- (void)sendNotifications {
+    while (self.pendingNotifications.count > 0) {
+        NSDictionary *notification = self.pendingNotifications.firstObject;
+        NSData *data = notification[@"data"];
+        CBMutableCharacteristic *characteristic = notification[@"characteristic"];
+        CBCentral *central = notification[@"central"];
+
+        BOOL success = [self.peripheralManager updateValue:data
+                                         forCharacteristic:characteristic
+                                      onSubscribedCentrals:@[central]];
+
+        if (!success) {
+            break;  // Wait until next ready callback
+        }
+
+        // Remove the successfully sent notification
+        [self.pendingNotifications removeObjectAtIndex:0];
+    }
 }
 
 #pragma mark - API
@@ -146,19 +167,22 @@
 
     for (auto it = emitters.begin(); it != emitters.end(); ++it) {
         if ([it->first isEqual:uuid]) {
-            auto cb = [peripheral, central, characteristic](NSData *data) {
-                NSLog(@"subscription note: %@ %@", data, NSStringFromClass(characteristic.class));
+            auto cb = [=](NSData *data) {
+                // NSLog(@"subscription note: %@ %@", data, NSStringFromClass(characteristic.class));
 
-                [peripheral updateValue:data
-                      forCharacteristic:characteristic
-                   onSubscribedCentrals:@[central]];
+                // Dispatch since cb is called from node
+                dispatch_async(self.queue, ^{
+                    NSDictionary *notification = @{
+                        @"data": data,
+                        @"characteristic": characteristic,
+                        @"central": central
+                    };
+                    [self.pendingNotifications addObject:notification];
+                    [self sendNotifications];
+                });
             };
 
             it->second.Subscribe(central.maximumUpdateValueLength, cb);
-
-            if ((characteristic.properties & CBCharacteristicPropertyNotify) == CBCharacteristicPropertyNotify) {
-
-            }
         }
     }
 }
@@ -224,6 +248,7 @@
 
 - (void)peripheralManagerIsReadyToUpdateSubscribers:(CBPeripheralManager *)peripheral {
     // NSLog(@"peripheralManagerIsReadyToUpdateSubscribers");
+    [self sendNotifications];
 }
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didPublishL2CAPChannel:(CBL2CAPPSM)PSM error:(nullable NSError *)error {
