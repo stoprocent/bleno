@@ -2,9 +2,10 @@
 
 #include <string>
 #include <vector>
+#include "peripheral.h"
+
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
-#include "peripheral.h"
 
 #define IF(type, var, code) type var = code; if(var)
 

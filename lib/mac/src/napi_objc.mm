@@ -25,7 +25,7 @@ NSString* napiToUuidString(Napi::String string) {
 
 NSArray* napiToUuidArray(Napi::Array array) {
     NSMutableArray* serviceUuids = [NSMutableArray arrayWithCapacity:array.Length()];
-    for(size_t i = 0;  i < array.Length(); i++) {
+    for(uint32_t i = 0;  i < array.Length(); i++) {
         Napi::Value val = array[i];
         [serviceUuids addObject:napiToUuidString(val.As<Napi::String>())];
     }
@@ -37,15 +37,14 @@ NSData* napiToData(Napi::Buffer<Byte> buffer) {
 }
 
 NSNumber* napiToNumber(Napi::Number number) {
-    return [NSNumber numberWithInt:number.Int64Value()];
+    return [NSNumber numberWithLong:number.Int64Value()];
 }
 
 NSArray<CBMutableService *> *napiArrayToCBMutableServices(Napi::Array array) {
-    // NSLog(@"napiArrayToCBMutableServices");
 
     NSMutableArray *services = [NSMutableArray array];
 
-    for (size_t i = 0;  i < array.Length(); i++) {
+    for (uint32_t i = 0;  i < array.Length(); i++) {
         Napi::Value v = array[i];
         Napi::Object obj = v.As<Napi::Object>();
 
@@ -56,11 +55,7 @@ NSArray<CBMutableService *> *napiArrayToCBMutableServices(Napi::Array array) {
 }
 
 CBMutableService *napiToCBMutableService(Napi::Object obj) {
-    // NSLog(@"napiToCBMutableService");
-
     NSString *uuid = napiToUuidString(obj.Get("uuid").ToString());
-
-    // NSLog(@"napiArrayToCBMutableService: uuid:%@", uuid);
 
     CBMutableService *service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:uuid]
                                                                primary:YES];
@@ -73,11 +68,9 @@ CBMutableService *napiToCBMutableService(Napi::Object obj) {
 
 
 NSArray<CBMutableCharacteristic *> *napiArrayToCBMutableCharacteristics(Napi::Array array) {
-    // NSLog(@"napiArrayToCBMutableCharacteristics");
-
     NSMutableArray *characteristics = [NSMutableArray array];
 
-    for (size_t i = 0; i < array.Length(); i++) {
+    for (uint32_t i = 0; i < array.Length(); i++) {
         Napi::Value v = array[i];
         Napi::Object obj = v.As<Napi::Object>();
 
@@ -88,13 +81,9 @@ NSArray<CBMutableCharacteristic *> *napiArrayToCBMutableCharacteristics(Napi::Ar
 }
 
 CBMutableCharacteristic *napiToCBMutableCharacteristic(Napi::Object obj) {
-    // NSLog(@"napiToCBMutableCharacteristic");
-
     NSString *uuid = napiToUuidString(obj.Get("uuid").ToString());
-    // NSLog(@"napiToCBMutableCharacteristic: cUUID:%@", uuid);
 
     NSData *value = obj.Get("value").IsBuffer() ? napiToData(obj.Get("value").As<Napi::Buffer<Byte>>()) : nil;
-    // NSLog(@"napiToCBMutableCharacteristic: value:%@", value);
 
     auto properties = obj.Get("properties").As<Napi::Array>();
     auto secure = obj.Get("secure").As<Napi::Array>();
@@ -112,8 +101,6 @@ CBMutableCharacteristic *napiToCBMutableCharacteristic(Napi::Object obj) {
 }
 
 CBCharacteristicProperties napiToCBCharacteristicProperties(Napi::Array properties, Napi::Array secure) {
-    // NSLog(@"napiToCBCharacteristicProperties");
-
     NSArray<NSString *> *p = napiToStringArray(properties);
     NSArray<NSString *> *s = napiToStringArray(secure);
 
@@ -151,8 +138,6 @@ CBCharacteristicProperties napiToCBCharacteristicProperties(Napi::Array properti
 }
 
 CBAttributePermissions napiToCBAttributePermissions(Napi::Array properties, Napi::Array secure) {
-    // NSLog(@"napiToCBAttributePermissions");
-
     NSArray<NSString *> *p = napiToStringArray(properties);
     NSArray<NSString *> *s = napiToStringArray(secure);
 
@@ -186,11 +171,9 @@ CBAttributePermissions napiToCBAttributePermissions(Napi::Array properties, Napi
 }
 
 NSArray<CBDescriptor *> *napiArrayToCBDescriptors(Napi::Array array) {
-    // NSLog(@"napiArrayToCBDescriptors");
-
     NSMutableArray *descriptors = [NSMutableArray array];
 
-    for (size_t i = 0; i < array.Length(); i++) {
+    for (uint32_t i = 0; i < array.Length(); i++) {
         Napi::Value v = array[i];
         Napi::Object obj = v.As<Napi::Object>();
 
@@ -204,8 +187,6 @@ CBDescriptor *napiToCBDescriptor(Napi::Object obj) {
     NSString *uuid = napiToUuidString(obj.Get("uuid").ToString());
     NSString *value = napiToString(obj.Get("value").ToString());
 
-    // NSLog(@"napiToCBDescriptor uuid:%@ value:%@", uuid, value);
-
     return [[CBMutableDescriptor alloc] initWithType:[CBUUID UUIDWithString:uuid]
                                                value:value];
 }
@@ -213,7 +194,7 @@ CBDescriptor *napiToCBDescriptor(Napi::Object obj) {
 NSArray<NSString *> *napiToStringArray(Napi::Array array) {
     NSMutableArray *ret = [NSMutableArray arrayWithCapacity:array.Length()];
 
-    for (size_t i = 0; i < array.Length(); i++) {
+    for (uint32_t i = 0; i < array.Length(); i++) {
         Napi::Value v = array[i];
         Napi::String str = v.ToString();
 
@@ -224,11 +205,9 @@ NSArray<NSString *> *napiToStringArray(Napi::Array array) {
 }
 
 std::map<Napi::String, Napi::Object> napiArrayToUUIDEmitters(Napi::Array services) {
-    // NSLog(@"napiArrayToUUIDEmitters");
-
     std::map<Napi::String, Napi::Object> map;
 
-    for (size_t i = 0;  i < services.Length(); i++) {
+    for (uint32_t i = 0;  i < services.Length(); i++) {
         Napi::Value vS = services[i];
         Napi::Object objS = vS.As<Napi::Object>();
 
@@ -237,7 +216,7 @@ std::map<Napi::String, Napi::Object> napiArrayToUUIDEmitters(Napi::Array service
         map[uuidS] = objS;
 
         Napi::Array characteristics = objS.Get("characteristics").As<Napi::Array>();
-        for (size_t j = 0;  j < characteristics.Length(); j++) {
+        for (uint32_t j = 0;  j < characteristics.Length(); j++) {
             Napi::Value vC = characteristics[j];
             Napi::Object objC = vC.As<Napi::Object>();
 
@@ -266,7 +245,7 @@ BOOL getBool(const Napi::Value& value, BOOL def) {
 
 NSArray* napiToCBUuidArray(Napi::Array array) {
     NSMutableArray* serviceUuids = [NSMutableArray arrayWithCapacity:array.Length()];
-    for(size_t i = 0;  i < array.Length(); i++) {
+    for(uint32_t i = 0;  i < array.Length(); i++) {
         Napi::Value val = array[i];
         [serviceUuids addObject:napiToCBUuidString(val.As<Napi::String>())];
     }

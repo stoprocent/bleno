@@ -7,11 +7,10 @@
 
 #pragma once
 
+#include <map>
+#include "callbacks.h"
+
 #import <CoreBluetooth/CoreBluetooth.h>
-
-#import "callbacks.h"
-
-#import <map>
 
 @interface BLEPeripheralManager : NSObject {
     @public Emit emit;
@@ -22,8 +21,6 @@
 
 - (void)start;
 - (void)startAdvertising:(NSString * _Nonnull)name serviceUUIDs:(NSArray<CBUUID *> * _Nonnull)serviceUUIDs;
-- (void)startAdvertisingIBeacon:(NSData * _Nullable)data;
-- (void)startAdvertisingWithEIRData:(NSData * _Nullable)data;
 - (void)stopAdvertising;
 - (void)setServices:(NSArray<CBMutableService *> * _Nonnull)services;
 - (void)disconnect;

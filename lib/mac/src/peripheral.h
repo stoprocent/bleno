@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 using Data = std::vector<uint8_t>;
 
 enum AddressType {

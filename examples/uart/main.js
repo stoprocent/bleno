@@ -1,7 +1,8 @@
-const bleno = require('../../with-custom-binding')({
+
+const { withBindings } = require('../../');
+const bleno = withBindings('hci', {
   bindParams: {
     uart: {
-      port: '/dev/tty...', // Specify the path to the UART device
       baudRate: 1000000
     }
   }

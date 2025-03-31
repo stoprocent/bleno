@@ -33,17 +33,19 @@ void Emit::Wrap(const Napi::Value& receiver, const Napi::Function& callback) {
     mCallback = std::make_shared<ThreadSafeCallback>(receiver, callback);
 }
 
-void Emit::AdvertisingStart() {
-    mCallback->call([](Napi::Env env, std::vector<napi_value>& args) {
+void Emit::AdvertisingStart(NSError * _Nullable error) {
+    mCallback->call([error](Napi::Env env, std::vector<napi_value>& args) {
         // emit('advertisingStart', error)
-        args = { _s("advertisingStart") };
+        const char *cerror = [error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding];
+        args = { _s("advertisingStart"), error ? Napi::Error::New(env, cerror).Value() : env.Null() };
     });
 }
 
-void Emit::ServicesSet() {
-    mCallback->call([](Napi::Env env, std::vector<napi_value>& args) {
+void Emit::ServicesSet(NSError * _Nullable error) {
+    mCallback->call([error](Napi::Env env, std::vector<napi_value>& args) {
         // emit('servicesSet',  this._setServicesError)
-        args = { _s("servicesSet") };
+        const char *cerror = [error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding];
+        args = { _s("servicesSet"), error ? Napi::Error::New(env, cerror).Value() : env.Null() };
     });
 }
 
@@ -58,7 +60,7 @@ void EmitCharacteristic::Wrap(const Napi::Value& receiver, const Napi::Function&
     mCallback = std::make_shared<ThreadSafeCallback>(receiver, callback);
 }
 
-void EmitCharacteristic::ReadRequest(int offset, std::function<void (int, NSData *)> completion) {
+void EmitCharacteristic::ReadRequest(uint16_t offset, std::function<void (uint16_t, NSData *)> completion) {
     mCallback->call([offset, completion](Napi::Env env, std::vector<napi_value>& args) {
         // callback(result, data)
         auto callable = [completion](const Napi::CallbackInfo& info){
@@ -72,7 +74,7 @@ void EmitCharacteristic::ReadRequest(int offset, std::function<void (int, NSData
     });
 }
 
-void EmitCharacteristic::WriteRequest(NSData *data, int offset, bool ignoreResponse, std::function<void (int)> completion) {
+void EmitCharacteristic::WriteRequest(NSData *data, uint16_t offset, bool ignoreResponse, std::function<void (uint16_t)> completion) {
     mCallback->call([data, offset, ignoreResponse, completion](Napi::Env env, std::vector<napi_value>& args) {
         // callback(result)
         auto callable = [completion](const Napi::CallbackInfo& info){
@@ -85,7 +87,7 @@ void EmitCharacteristic::WriteRequest(NSData *data, int offset, bool ignoreRespo
     });
 }
 
-void EmitCharacteristic::Subscribe(int maxValueSize, std::function<void (NSData *)> completion) {
+void EmitCharacteristic::Subscribe(uint16_t maxValueSize, std::function<void (NSData *)> completion) {
     mCallback->call([maxValueSize, completion](Napi::Env env, std::vector<napi_value>& args) {
         // callback(data)
         auto callable = [completion](const Napi::CallbackInfo& info){

@@ -42,30 +42,25 @@ if(!peripheralManager) { \
     THROW("BLEManager has already been cleaned up"); \
 }
 
-BlenoMac::BlenoMac(const Napi::CallbackInfo& info) : ObjectWrap(info) {
-}
+BlenoMac::BlenoMac(const Napi::CallbackInfo& info) : ObjectWrap(info) {}
 
 Napi::Value BlenoMac::Init(const Napi::CallbackInfo& info) {
-    // NSLog(@"BlenoMac::Init");
-
     Napi::Function emit = info.This().As<Napi::Object>().Get("emit").As<Napi::Function>();
     peripheralManager = [BLEPeripheralManager new];
     peripheralManager->emit.Wrap(info.This(), emit);
     [peripheralManager start];
-    return Napi::Value();
+    return info.Env().Undefined();
 }
 
 Napi::Value BlenoMac::CleanUp(const Napi::CallbackInfo& info) {
     CHECK_MANAGER()
     CFRelease((__bridge CFTypeRef)peripheralManager);
     peripheralManager = nil;
-    return Napi::Value();
+    return info.Env().Undefined();
 }
 
 // startAdvertising(name, undashedServiceUuids)
 Napi::Value BlenoMac::StartAdvertising(const Napi::CallbackInfo& info) {
-    // NSLog(@"BlenoMac::StartAdvertising");
-
     CHECK_MANAGER();
     ARG2(String, Array);
 
@@ -75,34 +70,38 @@ Napi::Value BlenoMac::StartAdvertising(const Napi::CallbackInfo& info) {
     [peripheralManager startAdvertising:name
                            serviceUUIDs:array];
 
-    return Napi::Value();
+    return info.Env().Undefined();
 }
 
 // startAdvertisingIBeacon(iBeaconData)
 Napi::Value BlenoMac::StartAdvertisingIBeacon(const Napi::CallbackInfo& info) {
-    // NSLog(@"BlenoMac::StartAdvertisingIBeacon");
+    NSError *error = [NSError errorWithDomain:CBErrorDomain code:CBErrorUnknown userInfo:@{
+        NSLocalizedDescriptionKey: @"Function not implemented"
+    }];
+    peripheralManager->emit.AdvertisingStart(error);
 
-    return Napi::Value();
+    return info.Env().Undefined();
 }
 
 // startAdvertisingWithEIRData(advertisementData, scanData)
 Napi::Value BlenoMac::StartAdvertisingWithEIRData(const Napi::CallbackInfo& info) {
-    // NSLog(@"BlenoMac::StartAdvertisingWithEIRData");
+    NSError *error = [NSError errorWithDomain:CBErrorDomain code:CBErrorUnknown userInfo:@{
+        NSLocalizedDescriptionKey: @"Function not implemented"
+    }];
+    peripheralManager->emit.AdvertisingStart(error);
 
-    return Napi::Value();
+    return info.Env().Undefined();
 }
 
 // stopAdvertising()
 Napi::Value BlenoMac::StopAdvertising(const Napi::CallbackInfo& info) {
-    // NSLog(@"BlenoMac::StopAdvertising");
-
-    return Napi::Value();
+    CHECK_MANAGER();
+    [peripheralManager stopAdvertising];
+    return info.Env().Undefined();
 }
 
 // setServices(services)
 Napi::Value BlenoMac::SetServices(const Napi::CallbackInfo& info) {
-    // NSLog(@"BlenoMac::SetServices");
-
     CHECK_MANAGER();
     ARG1(Array);
 
@@ -126,21 +125,17 @@ Napi::Value BlenoMac::SetServices(const Napi::CallbackInfo& info) {
 
     peripheralManager->emitters = emitters;
 
-    return Napi::Value();
+    return info.Env().Undefined();
 }
 
 // disconnect()
 Napi::Value BlenoMac::Disconnect(const Napi::CallbackInfo& info) {
-    // NSLog(@"BlenoMac::Disconnect");
-
-    return Napi::Value();
+    return info.Env().Undefined();
 }
 
 // updateRssi()
 Napi::Value BlenoMac::UpdateRssi(const Napi::CallbackInfo& info) {
-    // NSLog(@"BlenoMac::UpdateRssi");
-
-    return Napi::Value();
+    return info.Env().Undefined();
 }
 
 Napi::Function BlenoMac::GetClass(Napi::Env env) {

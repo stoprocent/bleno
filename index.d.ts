@@ -151,5 +151,28 @@ export interface Bleno extends NodeJS.EventEmitter {
     on(event: 'rssiUpdate', cb: (rssi: number) => void): this;
 }
 
+type BindingType = 'default' | 'hci' | 'mac';
+
+interface BaseBindingsOptions {
+    bindParams?: any;
+}
+
+interface HciBindingsOptions extends BaseBindingsOptions {
+    bindingType: 'hci';
+    hciDriver?: 'usb' | 'uart' | 'native';
+}
+
+interface DefaultBindingsOptions extends BaseBindingsOptions {
+    bindingType?: 'default' | 'mac';
+}
+
+type WithBindingsOptions = HciBindingsOptions | DefaultBindingsOptions;
+
+declare function withBindings(
+    bindingType?: BindingType, 
+    options?: WithBindingsOptions
+): Bleno;
+
 declare const bleno: Bleno;
 export = bleno;
+export { withBindings };

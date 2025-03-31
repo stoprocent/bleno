@@ -1,7 +1,6 @@
 #pragma once
 
 #include <napi.h>
-
 #include "ble_peripheral_manager.h"
 
 class BlenoMac : public Napi::ObjectWrap<BlenoMac>
