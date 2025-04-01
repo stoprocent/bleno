@@ -1,7 +1,4 @@
-const { withBindings } = require('../../');
-
-// const bleno = withBindings('mac');
-const bleno = withBindings('hci', { hciDriver: 'uart' });
+const bleno = require('../../');
 
 const BlenoCharacteristic = bleno.Characteristic;
 
@@ -24,7 +21,6 @@ class EchoCharacteristic extends BlenoCharacteristic {
   }
 
   onWriteRequest (connection, data, offset, withoutResponse, callback) {
-    console.log(this._updateValueCallbacks);
     this._value = data;
     console.log('EchoCharacteristic - onWriteRequest: handle = ' + connection + ' value = ' + this._value.toString('hex'));
 

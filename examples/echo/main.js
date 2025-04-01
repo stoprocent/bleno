@@ -1,6 +1,7 @@
 const { withBindings } = require('../../');
 
-const bleno = withBindings('mac');
+const bleno = withBindings('default');
+// const bleno = withBindings('mac');
 // const bleno = withBindings('hci', { hciDriver: 'uart' });
 
 const BlenoPrimaryService = bleno.PrimaryService;
