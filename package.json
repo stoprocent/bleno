@@ -49,7 +49,7 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^10.1.1",
+    "@semantic-release/github": "^11.0.1",
     "jshint": "^2.13.6",
     "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
@@ -60,15 +60,15 @@
     "mocha": "^10.7.0",
     "nyc": "^17.0.0",
     "prebuildify": "^6.0.1",
-    "prebuildify-cross": "thegecko/prebuildify-cross#fix-docker",
+    "prebuildify-cross": "^5.1.1",
     "should": "^13.2.3"
 
   },
   "dependencies": {
-    "debug": "^4.3.7",
+    "debug": "^4.4.0",
     "napi-thread-safe-callback": "^0.0.6",
-    "node-addon-api": "^8.1.0",
-    "node-gyp-build": "^4.8.1"
+    "node-addon-api": "^8.3.1",
+    "node-gyp-build": "^4.8.4"
   },
   "optionalDependencies": {
     "@stoprocent/bluetooth-hci-socket": "^2.1.0"
