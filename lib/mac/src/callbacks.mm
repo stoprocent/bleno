@@ -4,12 +4,12 @@
 //
 //  Created by Georg Vienna on 30.08.18.
 //
+#include <napi-thread-safe-callback.hpp>
 #include "callbacks.h"
-
-#import <napi-thread-safe-callback.hpp>
-
 #include "napi_objc.h"
+#include "objc_cpp.h"
 
+#define _a(val) Napi::String::New(env, convertToBlenoAddress(val))
 #define _s(val) Napi::String::New(env, val)
 #define _b(val) Napi::Boolean::New(env, val)
 #define _n(val) Napi::Number::New(env, val)
@@ -35,7 +35,6 @@ void Emit::Wrap(const Napi::Value& receiver, const Napi::Function& callback) {
 
 void Emit::AdvertisingStart(NSError * _Nullable error) {
     mCallback->call([error](Napi::Env env, std::vector<napi_value>& args) {
-        // emit('advertisingStart', error)
         const char *cerror = [error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding];
         args = { _s("advertisingStart"), error ? Napi::Error::New(env, cerror).Value() : env.Null() };
     });
@@ -43,7 +42,6 @@ void Emit::AdvertisingStart(NSError * _Nullable error) {
 
 void Emit::ServicesSet(NSError * _Nullable error) {
     mCallback->call([error](Napi::Env env, std::vector<napi_value>& args) {
-        // emit('servicesSet',  this._setServicesError)
         const char *cerror = [error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding];
         args = { _s("servicesSet"), error ? Napi::Error::New(env, cerror).Value() : env.Null() };
     });
@@ -51,7 +49,6 @@ void Emit::ServicesSet(NSError * _Nullable error) {
 
 void Emit::StateChange(const std::string& state) {
     mCallback->call([state](Napi::Env env, std::vector<napi_value>& args) {
-        // emit('stateChange', state);
         args = { _s("stateChange"), _s(state) };
     });
 }
@@ -60,67 +57,51 @@ void EmitCharacteristic::Wrap(const Napi::Value& receiver, const Napi::Function&
     mCallback = std::make_shared<ThreadSafeCallback>(receiver, callback);
 }
 
-void EmitCharacteristic::ReadRequest(uint16_t offset, std::function<void (uint16_t, NSData *)> completion) {
-    mCallback->call([offset, completion](Napi::Env env, std::vector<napi_value>& args) {
-        // callback(result, data)
+void EmitCharacteristic::ReadRequest(NSUUID *handle, uint16_t offset, std::function<void (uint16_t, NSData *)> completion) {
+    mCallback->call([handle, offset, completion](Napi::Env env, std::vector<napi_value>& args) {
         auto callable = [completion](const Napi::CallbackInfo& info){
             completion(info[0].As<Napi::Number>().Int32Value(),
                        napiToData(info[1].As<Napi::Buffer<Byte>>()));
         };
         Napi::Function cb = Napi::Function::New(env, callable);
-
-        // emit('readRequest', offset, callback);
-        args = { _s("readRequest"), _n(offset), cb };
+        args = { _s("readRequest"), _a(handle), _n(offset), cb };
     });
 }
 
-void EmitCharacteristic::WriteRequest(NSData *data, uint16_t offset, bool ignoreResponse, std::function<void (uint16_t)> completion) {
-    mCallback->call([data, offset, ignoreResponse, completion](Napi::Env env, std::vector<napi_value>& args) {
-        // callback(result)
+void EmitCharacteristic::WriteRequest(NSUUID *handle, NSData *data, uint16_t offset, bool ignoreResponse, std::function<void (uint16_t)> completion) {
+    mCallback->call([handle, data, offset, ignoreResponse, completion](Napi::Env env, std::vector<napi_value>& args) {
         auto callable = [completion](const Napi::CallbackInfo& info){
             completion(info[0].As<Napi::Number>().Int32Value());
         };
         Napi::Function cb = Napi::Function::New(env, callable);
-
-        // emit('writeRequest', data, offset, ignoreResponse, callback)
-        args = { _s("writeRequest"), toBufferFromNSData(env, data), _n(offset), _b(ignoreResponse), cb };
+        args = { _s("writeRequest"), _a(handle), toBufferFromNSData(env, data), _n(offset), _b(ignoreResponse), cb };
     });
 }
 
-void EmitCharacteristic::Subscribe(uint16_t maxValueSize, std::function<void (NSData *)> completion) {
-    mCallback->call([maxValueSize, completion](Napi::Env env, std::vector<napi_value>& args) {
-        // callback(data)
+void EmitCharacteristic::Subscribe(NSUUID *handle, uint16_t maxValueSize, std::function<void (NSData *)> completion) {
+    mCallback->call([handle, maxValueSize, completion](Napi::Env env, std::vector<napi_value>& args) {
         auto callable = [completion](const Napi::CallbackInfo& info){
             completion(napiToData(info[0].As<Napi::Buffer<Byte>>()));
         };
         Napi::Function cb = Napi::Function::New(env, callable);
-
-        // emit('subscribe', maxValueSize, callback)
-        args = { _s("subscribe"), _n(maxValueSize), cb };
+        args = { _s("subscribe"), _a(handle), _n(maxValueSize), cb };
     });
 }
 
-void EmitCharacteristic::Unsubscribe() {
-    mCallback->call([](Napi::Env env, std::vector<napi_value>& args) {
-        // emit('unsubscribe')
-        args = { _s("unsubscribe") };
+void EmitCharacteristic::Unsubscribe(NSUUID *handle) {
+    mCallback->call([handle](Napi::Env env, std::vector<napi_value>& args) {
+        args = { _s("unsubscribe"), _a(handle) };
     });
 }
 
-void EmitCharacteristic::Notify() {
-    mCallback->call([](Napi::Env env, std::vector<napi_value>& args) {
-        // emit('notify')
-        args = { _s("notify") };
+void EmitCharacteristic::Notify(NSUUID *handle) {
+    mCallback->call([handle](Napi::Env env, std::vector<napi_value>& args) {
+        args = { _s("notify"), _a(handle) };
     });
 }
 
-void EmitCharacteristic::Indicate() {
-    mCallback->call([](Napi::Env env, std::vector<napi_value>& args) {
-        // emit('indicate')
-        args = { _s("indicate") };
+void EmitCharacteristic::Indicate(NSUUID *handle) {
+    mCallback->call([handle](Napi::Env env, std::vector<napi_value>& args) {
+        args = { _s("indicate"), _a(handle) };
     });
 }
-
-
-// emit('notify');
-// emit('indicate');

@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include "peripheral.h"
 
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
@@ -22,7 +21,7 @@ std::string StringFromCBPeripheralState(CBManagerState state);
 
 NSString* getNSUuid(CBPeripheral* peripheral);
 std::string getUuid(CBPeripheral* peripheral);
-std::string getAddress(std::string uuid, AddressType* addressType);
+std::string convertToBlenoAddress(NSUUID* uuid);
 std::vector<std::string> getServices(NSArray<CBService*>* services);
 std::vector<std::pair<std::string, std::vector<std::string>>> getCharacteristics(NSArray<CBCharacteristic*>* characteristics);
 std::vector<std::string> getDescriptors(NSArray<CBDescriptor*>* descriptors);

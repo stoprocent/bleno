@@ -1,4 +1,7 @@
-const bleno = require('../..');
+const { withBindings } = require('../../');
+
+// const bleno = withBindings('mac');
+const bleno = withBindings('hci', { hciDriver: 'uart' });
 
 const BlenoCharacteristic = bleno.Characteristic;
 
@@ -12,16 +15,18 @@ class EchoCharacteristic extends BlenoCharacteristic {
 
     this._value = Buffer.alloc(0);
     this._updateValueCallbacks = new Map();
+    console.log("RECREATED");
   }
 
   onReadRequest (connection, offset, callback) {
-    console.log('EchoCharacteristic - onReadRequest: value = ' + this._value.toString('hex'));
+    console.log('EchoCharacteristic - onReadRequest: handle = ' + connection + ' value = ' + this._value.toString('hex'));
     callback(this.RESULT_SUCCESS, this._value);
   }
 
   onWriteRequest (connection, data, offset, withoutResponse, callback) {
+    console.log(this._updateValueCallbacks);
     this._value = data;
-    console.log('EchoCharacteristic - onWriteRequest: value = ' + this._value.toString('hex'));
+    console.log('EchoCharacteristic - onWriteRequest: handle = ' + connection + ' value = ' + this._value.toString('hex'));
 
     for (const updateValueCallback of this._updateValueCallbacks.values()) {
       console.log('EchoCharacteristic - onWriteRequest: notifying');
@@ -32,12 +37,12 @@ class EchoCharacteristic extends BlenoCharacteristic {
   }
 
   onSubscribe (connection, maxValueSize, updateValueCallback) {
-    console.log('EchoCharacteristic - onSubscribe');
+    console.log('EchoCharacteristic - onSubscribe: handle = ' + connection);
     this._updateValueCallbacks.set(connection, updateValueCallback);
   }
 
   onUnsubscribe (connection) {
-    console.log('EchoCharacteristic - onUnsubscribe');
+    console.log('EchoCharacteristic - onUnsubscribe: handle = ' + connection);
     this._updateValueCallbacks.delete(connection);
   }
 }

@@ -7,28 +7,6 @@
 #include "objc_cpp.h"
 
 #if defined(MAC_OS_X_VERSION_10_13)
-//#pragma clang diagnostic push
-//#pragma clang diagnostic ignored "-Wunguarded-availability"
-//std::string stateToString(CBManagerState state)
-//{
-//    switch(state) {
-//        case CBManagerStatePoweredOff:
-//            return "poweredOff";
-//        case CBManagerStatePoweredOn:
-//            return "poweredOn";
-//        case CBManagerStateResetting:
-//            return "resetting";
-//        case CBManagerStateUnauthorized:
-//            return "unauthorized";
-//        case CBManagerStateUnknown:
-//            return "unknown";
-//        case CBManagerStateUnsupported:
-//            return "unsupported";
-//    }
-//    return "unknown";
-//}
-//#pragma clang diagnostic pop
-
 // In the 10.13 SDK, CBPeripheral became a subclass of CBPeer, which defines
 // -[CBPeer identifier] as partially available. Pretend it still exists on
 // CBPeripheral. At runtime the implementation on CBPeer will be invoked.
@@ -82,21 +60,9 @@ std::string getUuid(CBPeripheral* peripheral) {
     return std::string([peripheral.identifier.UUIDString UTF8String]);
 }
 
-std::string getAddress(std::string uuid, AddressType* addressType) {
-    NSString* deviceUuid = [[NSString alloc] initWithCString:uuid.c_str() encoding:NSASCIIStringEncoding];
-    IF(NSDictionary*, plist, [NSDictionary dictionaryWithContentsOfFile:@"/Library/Preferences/com.apple.Bluetooth.plist"]) {
-        IF(NSDictionary*, cache, [plist objectForKey:@"CoreBluetoothCache"]) {
-            IF(NSDictionary*, entry, [cache objectForKey:deviceUuid]) {
-                IF(NSNumber*, type, [entry objectForKey:@"DeviceAddressType"]) {
-                    *addressType = [type boolValue] ? RANDOM : PUBLIC;
-                }
-                IF(NSString*, address, [entry objectForKey:@"DeviceAddress"]) {
-                    return [address UTF8String];
-                }
-            }
-        }
-    }
-    return "";
+std::string convertToBlenoAddress(NSUUID* uuid) {
+    NSString* addressString = [[uuid.UUIDString stringByReplacingOccurrencesOfString:@"-" withString:@""] lowercaseString];
+    return std::string([addressString UTF8String]);
 }
 
 std::vector<std::string> getServices(NSArray<CBService*>* services) {

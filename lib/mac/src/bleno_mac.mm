@@ -59,7 +59,6 @@ Napi::Value BlenoMac::CleanUp(const Napi::CallbackInfo& info) {
     return info.Env().Undefined();
 }
 
-// startAdvertising(name, undashedServiceUuids)
 Napi::Value BlenoMac::StartAdvertising(const Napi::CallbackInfo& info) {
     CHECK_MANAGER();
     ARG2(String, Array);
@@ -73,7 +72,6 @@ Napi::Value BlenoMac::StartAdvertising(const Napi::CallbackInfo& info) {
     return info.Env().Undefined();
 }
 
-// startAdvertisingIBeacon(iBeaconData)
 Napi::Value BlenoMac::StartAdvertisingIBeacon(const Napi::CallbackInfo& info) {
     NSError *error = [NSError errorWithDomain:CBErrorDomain code:CBErrorUnknown userInfo:@{
         NSLocalizedDescriptionKey: @"Function not implemented"
@@ -83,7 +81,6 @@ Napi::Value BlenoMac::StartAdvertisingIBeacon(const Napi::CallbackInfo& info) {
     return info.Env().Undefined();
 }
 
-// startAdvertisingWithEIRData(advertisementData, scanData)
 Napi::Value BlenoMac::StartAdvertisingWithEIRData(const Napi::CallbackInfo& info) {
     NSError *error = [NSError errorWithDomain:CBErrorDomain code:CBErrorUnknown userInfo:@{
         NSLocalizedDescriptionKey: @"Function not implemented"
@@ -93,14 +90,12 @@ Napi::Value BlenoMac::StartAdvertisingWithEIRData(const Napi::CallbackInfo& info
     return info.Env().Undefined();
 }
 
-// stopAdvertising()
 Napi::Value BlenoMac::StopAdvertising(const Napi::CallbackInfo& info) {
     CHECK_MANAGER();
     [peripheralManager stopAdvertising];
     return info.Env().Undefined();
 }
 
-// setServices(services)
 Napi::Value BlenoMac::SetServices(const Napi::CallbackInfo& info) {
     CHECK_MANAGER();
     ARG1(Array);
@@ -128,12 +123,10 @@ Napi::Value BlenoMac::SetServices(const Napi::CallbackInfo& info) {
     return info.Env().Undefined();
 }
 
-// disconnect()
 Napi::Value BlenoMac::Disconnect(const Napi::CallbackInfo& info) {
     return info.Env().Undefined();
 }
 
-// updateRssi()
 Napi::Value BlenoMac::UpdateRssi(const Napi::CallbackInfo& info) {
     return info.Env().Undefined();
 }
@@ -142,7 +135,6 @@ Napi::Function BlenoMac::GetClass(Napi::Env env) {
     return DefineClass(env, "BlenoMac", {
         BlenoMac::InstanceMethod("init", &BlenoMac::Init),
         BlenoMac::InstanceMethod("cleanUp", &BlenoMac::CleanUp),
-
         BlenoMac::InstanceMethod("startAdvertising", &BlenoMac::StartAdvertising),
         BlenoMac::InstanceMethod("startAdvertisingIBeacon", &BlenoMac::StartAdvertisingIBeacon),
         BlenoMac::InstanceMethod("startAdvertisingWithEIRData", &BlenoMac::StartAdvertisingWithEIRData),

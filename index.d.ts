@@ -9,26 +9,33 @@ type State = 'poweredOn' | 'poweredOff' | 'unauthorized' | 'unsupported' | 'unkn
 
 type Property = 'read' | 'write' | 'indicate' | 'notify' | 'writeWithoutResponse';
 
+type ConnectionHandle = number | string;
+
+// Common callback types
+type ReadRequestCallback = (result: number, data?: Buffer) => void;
+type UpdateValueCallback = (data?: Buffer) => void;
+type WriteRequestCallback = (result: number) => void;
+
+// Common function types
+type OnReadRequestFn = (handle: ConnectionHandle, offset: number, callback: ReadRequestCallback) => void;
+type OnSubscribeFn = (handle: ConnectionHandle, maxValueSize: number, updateValueCallback: UpdateValueCallback) => void;
+type OnUnsubscribeFn = (handle: ConnectionHandle) => void;
+type OnWriteRequestFn = (handle: ConnectionHandle, data: Buffer, offset: number, withoutResponse: boolean, callback: WriteRequestCallback) => void;
+type OnIndicateFn = (handle: ConnectionHandle) => void;
+type OnNotifyFn = (handle: ConnectionHandle) => void;
+
 interface CharacteristicOptions {
     uuid: string;
     properties?: ReadonlyArray<Property> | null;
     secure?: ReadonlyArray<Property> | null;
     value?: Buffer | null;
     descriptors?: ReadonlyArray<Descriptor> | null;
-    onIndicate?: (() => void) | null;
-    onNotify?: (() => void) | null;
-    onReadRequest?: ((
-        offset: number,
-        callback: (result: number, data?: Buffer) => void
-    ) => void) | null;
-    onSubscribe?: ((maxValueSize: number, updateValueCallback: (data: Buffer) => void) => void) | null;
-    onUnsubscribe?: (() => void) | null;
-    onWriteRequest?: ((
-        data: Buffer,
-        offset: number,
-        withoutResponse: boolean,
-        callback: (result: number) => void
-    ) => void) | null;
+    onIndicate?: OnIndicateFn | null;
+    onNotify?: OnNotifyFn | null;
+    onReadRequest?: OnReadRequestFn | null;
+    onSubscribe?: OnSubscribeFn | null;
+    onUnsubscribe?: OnUnsubscribeFn | null;
+    onWriteRequest?: OnWriteRequestFn | null;
 }
 
 declare class Characteristic {
@@ -40,38 +47,25 @@ declare class Characteristic {
 
     constructor(options: CharacteristicOptions);
 
-    onIndicate(): void;
-
-    onNotify(): void;
-
-    onReadRequest(offset: number, callback: (result: number, data?: Buffer) => void): void;
-
-    onSubscribe(maxValueSize: number, updateValueCallback: (data: Buffer) => void): void;
-
-    onUnsubscribe(): void;
-
-    onWriteRequest(data: Buffer, offset: number, withoutResponse: boolean, callback: (result: number) => void): void;
+    onIndicate: OnIndicateFn;
+    onNotify: OnNotifyFn;
+    onReadRequest: OnReadRequestFn;
+    onSubscribe: OnSubscribeFn;
+    onUnsubscribe: OnUnsubscribeFn;
+    onWriteRequest: OnWriteRequestFn;
 
     toString(): string;
 
     readonly RESULT_ATTR_NOT_LONG: number;
-
     readonly RESULT_INVALID_ATTRIBUTE_LENGTH: number;
-
     readonly RESULT_INVALID_OFFSET: number;
-
     readonly RESULT_SUCCESS: number;
-
     readonly RESULT_UNLIKELY_ERROR: number;
 
     static readonly RESULT_ATTR_NOT_LONG: number;
-
     static readonly RESULT_INVALID_ATTRIBUTE_LENGTH: number;
-
     static readonly RESULT_INVALID_OFFSET: number;
-
     static readonly RESULT_SUCCESS: number;
-
     static readonly RESULT_UNLIKELY_ERROR: number;
 }
 
@@ -163,9 +157,9 @@ export interface Bleno extends NodeJS.EventEmitter {
     on(event: 'stateChange', cb: (state: State) => void): this;
     on(event: 'platform', cb: (platform: NodeJS.Platform) => void): this;
     on(event: 'addressChange', cb: (address: string) => void): this;
-    on(event: 'accept', cb: (address: string) => void): this;
+    on(event: 'accept', cb: (address: string, handle: ConnectionHandle) => void): this;
     on(event: 'mtuChange', cb: (mtu: number) => void): this;
-    on(event: 'disconnect', cb: (clientAddress: string) => void): this;
+    on(event: 'disconnect', cb: (address: string, handle: ConnectionHandle) => void): this;
     on(event: 'advertisingStart', cb: (err?: Error | null) => void): this;
     on(event: 'advertisingStartError', cb: (err: Error) => void): this;
     on(event: 'advertisingStop', cb: () => void): this;

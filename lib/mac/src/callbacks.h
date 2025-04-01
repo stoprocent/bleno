@@ -1,11 +1,11 @@
 #pragma once
 
 #include <napi.h>
-#include "peripheral.h"
 
 #import <Foundation/Foundation.h>
 
 class ThreadSafeCallback;
+using Data = std::vector<uint8_t>;
 
 NS_ASSUME_NONNULL_BEGIN
 class Emit {
@@ -21,12 +21,12 @@ protected:
 class EmitCharacteristic {
 public:
     void Wrap(const Napi::Value& receiver, const Napi::Function& callback);
-    void ReadRequest(uint16_t offset, std::function<void (uint16_t, NSData *)> completion);
-    void WriteRequest(NSData *data, uint16_t offset, bool ignoreResponse, std::function<void (uint16_t)> completion);
-    void Subscribe(uint16_t maxValueSize, std::function<void (NSData *)> completion);
-    void Unsubscribe();
-    void Notify();
-    void Indicate();
+    void ReadRequest(NSUUID *handle, uint16_t offset, std::function<void (uint16_t, NSData *)> completion);
+    void WriteRequest(NSUUID *handle, NSData *data, uint16_t offset, bool ignoreResponse, std::function<void (uint16_t)> completion);
+    void Subscribe(NSUUID *handle, uint16_t maxValueSize, std::function<void (NSData *)> completion);
+    void Unsubscribe(NSUUID *handle);
+    void Notify(NSUUID *handle);
+    void Indicate(NSUUID *handle);
 protected:
     std::shared_ptr<ThreadSafeCallback> mCallback;
 

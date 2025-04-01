@@ -1,4 +1,7 @@
-const bleno = require('../..');
+const { withBindings } = require('../../');
+
+const bleno = withBindings('mac');
+// const bleno = withBindings('hci', { hciDriver: 'uart' });
 
 const BlenoPrimaryService = bleno.PrimaryService;
 
@@ -15,6 +18,10 @@ bleno.on('stateChange', function (state) {
   } else {
     bleno.stopAdvertising();
   }
+});
+
+bleno.on('accept', function (device, handle) {
+  console.log('on -> accept: ' + device + ' ' + handle);
 });
 
 bleno.on('advertisingStart', function (error) {

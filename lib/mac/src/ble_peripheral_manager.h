@@ -18,7 +18,6 @@
 }
 
 - (nonnull instancetype)init NS_DESIGNATED_INITIALIZER;
-
 - (void)start;
 - (void)startAdvertising:(NSString * _Nonnull)name serviceUUIDs:(NSArray<CBUUID *> * _Nonnull)serviceUUIDs;
 - (void)stopAdvertising;
