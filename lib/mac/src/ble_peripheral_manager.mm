@@ -11,17 +11,9 @@
 #include "objc_cpp.h"
 
 @interface BLEPeripheralManager () <CBPeripheralManagerDelegate>
-
-@property (nonatomic, strong) dispatch_queue_t queue;
+@property (nonatomic, strong) dispatch_queue_t processingQueue;
 @property (nonatomic, strong) NSMutableArray<NSDictionary *> *pendingNotifications;
 @property (nonatomic, strong) CBPeripheralManager *peripheralManager;
-
-- (void)addNotification:(NSData *)data 
-         characteristic:(CBMutableCharacteristic *)characteristic 
-                 central:(CBCentral *)central;
-- (void)processNotificationQueue;
-- (BOOL)sendNextNotification;
-
 @end
 
 @implementation BLEPeripheralManager
@@ -29,7 +21,7 @@
 - (instancetype)init 
 {
     if (self = [super init]) {
-        self.queue = dispatch_queue_create("com.bleno.notificationQueue", DISPATCH_QUEUE_SERIAL);
+        self.processingQueue = dispatch_queue_create("com.bleno.processing.queue", DISPATCH_QUEUE_SERIAL);
         self.pendingNotifications = [NSMutableArray array];
     }
     return self;
@@ -43,11 +35,12 @@
 
 #pragma mark - Notification Management
 
-- (void)addNotification:(NSData *)data 
-         characteristic:(CBMutableCharacteristic *)characteristic 
+- (void)addNotification:(NSData *)data
+         characteristic:(CBMutableCharacteristic *)characteristic
                  central:(CBCentral *)central 
 {
-    dispatch_async(self.queue, ^{
+    // All operations are now done on the same serial queue.
+    dispatch_async(self.processingQueue, ^{
         NSDictionary *notification = @{
             @"data": data,
             @"characteristic": characteristic,
@@ -60,40 +53,31 @@
 
 - (void)processNotificationQueue 
 {
-    dispatch_async(self.queue, ^{
-        while (self.pendingNotifications.count > 0) {
-            if (![self sendNextNotification]) {
-                break; // Wait for next ready callback
-            }
+    // Since this runs on the serial queue, no additional synchronization is needed.
+    while (self.pendingNotifications.count > 0) {
+        NSDictionary *notification = self.pendingNotifications.firstObject;
+        NSData *data = notification[@"data"];
+        CBMutableCharacteristic *characteristic = notification[@"characteristic"];
+        CBCentral *central = notification[@"central"];
+        
+        BOOL success = [self.peripheralManager updateValue:data
+                                         forCharacteristic:characteristic
+                                      onSubscribedCentrals:@[central]];
+        if (success) {
+            [self.pendingNotifications removeObjectAtIndex:0];
+        } else {
+            // Stop processing if updateValue fails; will retry on next callback.
+            break;
         }
-    });
-}
-
-- (BOOL)sendNextNotification {
-    NSDictionary *notification = self.pendingNotifications.firstObject;
-    if (!notification) return NO;
-
-    NSData *data = notification[@"data"];
-    CBMutableCharacteristic *characteristic = notification[@"characteristic"];
-    CBCentral *central = notification[@"central"];
-
-    BOOL success = [self.peripheralManager updateValue:data
-                                     forCharacteristic:characteristic
-                                  onSubscribedCentrals:@[central]];
-
-    if (success) {
-        [self.pendingNotifications removeObjectAtIndex:0];
-        return YES;
     }
-
-    return NO;
 }
 
 #pragma mark - API
 
 - (void)start 
 {
-    self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:self.queue];
+    self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self
+                                                                     queue:self.processingQueue];
 }
 
 - (void)startAdvertising:(nonnull NSString *)name serviceUUIDs:(nonnull NSArray<CBUUID *> *)serviceUUIDs 
