@@ -93,6 +93,7 @@ Napi::Value BlenoMac::StartAdvertisingWithEIRData(const Napi::CallbackInfo& info
 Napi::Value BlenoMac::StopAdvertising(const Napi::CallbackInfo& info) {
     CHECK_MANAGER();
     [peripheralManager stopAdvertising];
+    peripheralManager->emit.AdvertisingStop();
     return info.Env().Undefined();
 }
 

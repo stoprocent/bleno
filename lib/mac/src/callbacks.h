@@ -12,6 +12,7 @@ class Emit {
 public:
     void Wrap(const Napi::Value& receiver, const Napi::Function& callback);
     void AdvertisingStart(NSError * _Nullable error);
+    void AdvertisingStop();
     void ServicesSet(NSError * _Nullable error);
     void StateChange(const std::string& state);
 protected:

@@ -40,6 +40,12 @@ void Emit::AdvertisingStart(NSError * _Nullable error) {
     });
 }
 
+void Emit::AdvertisingStop() {
+    mCallback->call([](Napi::Env env, std::vector<napi_value>& args) {
+        args = { _s("advertisingStop") };
+    });
+}
+
 void Emit::ServicesSet(NSError * _Nullable error) {
     mCallback->call([error](Napi::Env env, std::vector<napi_value>& args) {
         const char *cerror = [error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding];

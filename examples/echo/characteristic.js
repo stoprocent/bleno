@@ -1,8 +1,6 @@
-const bleno = require('../../');
+const { Characteristic } = require('../../');
 
-const BlenoCharacteristic = bleno.Characteristic;
-
-class EchoCharacteristic extends BlenoCharacteristic {
+class EchoCharacteristic extends Characteristic {
   constructor () {
     super({
       uuid: 'ec0e',
@@ -12,7 +10,6 @@ class EchoCharacteristic extends BlenoCharacteristic {
 
     this._value = Buffer.alloc(0);
     this._updateValueCallbacks = new Map();
-    console.log("RECREATED");
   }
 
   onReadRequest (connection, offset, callback) {

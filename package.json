@@ -71,9 +71,7 @@
     "node-gyp-build": "^4.8.1"
   },
   "optionalDependencies": {
-    "@stoprocent/bluetooth-hci-socket": "^2.0.0",
-    "bplist-parser": "0.3.2",
-    "xpc-connect": "^3.0.0"
+    "@stoprocent/bluetooth-hci-socket": "^2.1.0"
   },
   "publishConfig": {
     "access": "public"
