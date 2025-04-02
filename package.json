@@ -50,23 +50,22 @@
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^11.0.1",
-    "jshint": "^2.13.6",
     "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.30.0",
     "eslint-plugin-n": "^17.10.3",
     "eslint-plugin-promise": "^7.1.0",
-    "node-blink1": "^0.5.1",
+    "jshint": "^2.13.6",
     "mocha": "^10.7.0",
+    "napi-thread-safe-callback": "^0.0.6",
+    "node-blink1": "^0.5.1",
     "nyc": "^17.0.0",
     "prebuildify": "^6.0.1",
     "prebuildify-cross": "^5.1.1",
     "should": "^13.2.3"
-
   },
   "dependencies": {
     "debug": "^4.4.0",
-    "napi-thread-safe-callback": "^0.0.6",
     "node-addon-api": "^8.3.1",
     "node-gyp-build": "^4.8.4"
   },
