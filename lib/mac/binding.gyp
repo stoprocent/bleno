@@ -6,15 +6,11 @@
     {
       'target_name': 'binding',
       'sources': [ 
-        'src/bleno_mac.mm', 
-        'src/napi_objc.mm', 
-        'src/ble_peripheral_manager.mm', 
-        'src/objc_cpp.mm',
-        'src/callbacks.mm' 
+        "<!@(node -p \"require('fs').readdirSync('src').filter(f=>new RegExp('.*\\\\.(c|cc|cpp|mm)$').test(f)).map(f=>'src/'+f).join(' ')\")",
       ],
       'include_dirs': [
         "<!(node -p \"require('node-addon-api').include_dir\")",
-        "<!@(node -p \"require('napi-thread-safe-callback').include\")"
+        "../common/include"
       ],
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],

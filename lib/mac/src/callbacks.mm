@@ -4,10 +4,11 @@
 //
 //  Created by Georg Vienna on 30.08.18.
 //
-#include <napi-thread-safe-callback.hpp>
+
 #include "callbacks.h"
 #include "napi_objc.h"
 #include "objc_cpp.h"
+#include "ThreadSafeCallback.h"
 
 #define _a(val) Napi::String::New(env, convertToBlenoAddress(val))
 #define _s(val) Napi::String::New(env, val)
