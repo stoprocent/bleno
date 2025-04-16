@@ -70,7 +70,7 @@
     "node-gyp-build": "^4.8.4"
   },
   "optionalDependencies": {
-    "@stoprocent/bluetooth-hci-socket": "^2.1.0"
+    "@stoprocent/bluetooth-hci-socket": "^2.1.1"
   },
   "publishConfig": {
     "access": "public"
