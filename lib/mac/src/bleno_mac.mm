@@ -52,9 +52,8 @@ Napi::Value BlenoMac::Init(const Napi::CallbackInfo& info) {
     return info.Env().Undefined();
 }
 
-Napi::Value BlenoMac::CleanUp(const Napi::CallbackInfo& info) {
+Napi::Value BlenoMac::Stop(const Napi::CallbackInfo& info) {
     CHECK_MANAGER()
-    CFRelease((__bridge CFTypeRef)peripheralManager);
     peripheralManager = nil;
     return info.Env().Undefined();
 }
@@ -135,7 +134,7 @@ Napi::Value BlenoMac::UpdateRssi(const Napi::CallbackInfo& info) {
 Napi::Function BlenoMac::GetClass(Napi::Env env) {
     return DefineClass(env, "BlenoMac", {
         BlenoMac::InstanceMethod("init", &BlenoMac::Init),
-        BlenoMac::InstanceMethod("cleanUp", &BlenoMac::CleanUp),
+        BlenoMac::InstanceMethod("stop", &BlenoMac::Stop),
         BlenoMac::InstanceMethod("startAdvertising", &BlenoMac::StartAdvertising),
         BlenoMac::InstanceMethod("startAdvertisingIBeacon", &BlenoMac::StartAdvertisingIBeacon),
         BlenoMac::InstanceMethod("startAdvertisingWithEIRData", &BlenoMac::StartAdvertisingWithEIRData),
