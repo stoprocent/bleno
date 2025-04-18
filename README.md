@@ -1,18 +1,7 @@
 # bleno
 
-[![GitHub forks](
-https://img.shields.io/github/forks/stoprocent/bleno.svg?style=social&label=Fork&maxAge=2592000
-)](
-https://GitHub.com/stoprocent/bleno/network/
-)
-[![license](
-https://img.shields.io/badge/license-MIT-0.svg
-)](MIT)
-[![NPM](
-https://img.shields.io/npm/v/@stoprocent/bleno.svg
-)](
-https://www.npmjs.com/package/@stoprocent/bleno
-)
+[![npm version](https://badgen.net/npm/v/@stoprocent/bleno)](https://www.npmjs.com/package/@stoprocent/bleno)
+[![npm downloads](https://badgen.net/npm/dt/@stoprocent/bleno)](https://www.npmjs.com/package/@stoprocent/bleno)
 
 A Node.js module for implementing BLE (Bluetooth Low Energy) peripherals.
 
