@@ -51,12 +51,12 @@ declare module '@stoprocent/bleno' {
 
         constructor(options: CharacteristicOptions);
 
-        onIndicate: OnIndicateFn;
-        onNotify: OnNotifyFn;
-        onReadRequest: OnReadRequestFn;
-        onSubscribe: OnSubscribeFn;
-        onUnsubscribe: OnUnsubscribeFn;
-        onWriteRequest: OnWriteRequestFn;
+        onIndicate(handle: ConnectionHandle): void;
+        onNotify(handle: ConnectionHandle): void;
+        onReadRequest(handle: ConnectionHandle, offset: number, callback: ReadRequestCallback): void;
+        onSubscribe(handle: ConnectionHandle, maxValueSize: number, updateValueCallback: UpdateValueCallback): void;
+        onUnsubscribe(handle: ConnectionHandle): void;
+        onWriteRequest(handle: ConnectionHandle, data: Buffer, offset: number, withoutResponse: boolean, callback: WriteRequestCallback): void;
 
         toString(): string;
 
