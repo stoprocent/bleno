@@ -179,8 +179,14 @@ declare module '@stoprocent/bleno' {
     }
 
     export interface HciBindingsOptions extends BaseBindingsOptions {
+        /** Driver Type ('default' | 'uart' | 'usb' | 'native') */
         hciDriver?: import('@stoprocent/bluetooth-hci-socket').DriverType;
+        /** Bind Params (for USB and UART Hci Drivers only) */
         bindParams?: import('@stoprocent/bluetooth-hci-socket').BindParams;
+        /** HCI Device ID (Linux Only), Default is 0 */
+        deviceId?: number;
+        /** Uses User channel instead of Raw HCI Channel */
+        userChannel?: boolean;
     }
 
     export interface MacBindingsOptions extends BaseBindingsOptions {
