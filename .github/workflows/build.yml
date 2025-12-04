@@ -11,16 +11,16 @@ jobs:
       matrix:
         include:
           - name: darwin
-            os: macos-14
+            os: macos-latest
             node: x64
             command: prebuildify
             args: --arch x64+arm64
           - name: win32-x86
-            os: windows-2019
+            os: windows-latest
             node: x86
             command: prebuildify
           - name: win32-x64
-            os: windows-2019
+            os: windows-latest
             node: x64
             command: prebuildify
           - name: linux-x64
@@ -38,7 +38,7 @@ jobs:
     name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     steps:
-      - if: matrix.os == 'macos-14'
+      - if: matrix.os == 'macos-latest'
         run: sudo -H pip install setuptools
       - uses: actions/checkout@v4
       - if: matrix.node
