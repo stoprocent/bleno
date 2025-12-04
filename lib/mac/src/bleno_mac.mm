@@ -54,6 +54,9 @@ Napi::Value BlenoMac::Init(const Napi::CallbackInfo& info) {
 
 Napi::Value BlenoMac::Stop(const Napi::CallbackInfo& info) {
     CHECK_MANAGER()
+    // Properly clean up: stop advertising, remove all services
+    [peripheralManager stopAdvertising];
+    [peripheralManager removeAllServices];
     peripheralManager = nil;
     return info.Env().Undefined();
 }

@@ -14,6 +14,10 @@
 @property (nonatomic, strong) dispatch_queue_t processingQueue;
 @property (nonatomic, strong) NSMutableArray<NSDictionary *> *pendingNotifications;
 @property (nonatomic, strong) CBPeripheralManager *peripheralManager;
+@property (nonatomic, strong, readwrite) NSMutableSet<NSUUID *> *connectedCentrals;
+@property (nonatomic, strong, readwrite) NSMutableArray<CBMutableService *> *currentServices;
+@property (nonatomic, assign) BOOL triedWithRestoration;
+@property (nonatomic, assign) BOOL retriedWithoutRestoration;
 @end
 
 @implementation BLEPeripheralManager
@@ -23,14 +27,19 @@
     if (self = [super init]) {
         self.processingQueue = dispatch_queue_create("com.bleno.processing.queue", DISPATCH_QUEUE_SERIAL);
         self.pendingNotifications = [NSMutableArray array];
+        self.connectedCentrals = [NSMutableSet set];
+        self.currentServices = [NSMutableArray array];
     }
     return self;
 }
 
 - (void)dealloc 
 {
+    [self removeAllServices];
     self.peripheralManager.delegate = nil;
     [self.pendingNotifications removeAllObjects];
+    [self.connectedCentrals removeAllObjects];
+    [self.currentServices removeAllObjects];
 }
 
 #pragma mark - Notification Management
@@ -76,8 +85,36 @@
 
 - (void)start 
 {
+    [self startWithRestoration:YES];
+}
+
+- (void)startWithRestoration:(BOOL)useRestoration 
+{
+    // Clean up any existing peripheral manager
+    if (self.peripheralManager) {
+        self.peripheralManager.delegate = nil;
+        self.peripheralManager = nil;
+    }
+    
+    NSDictionary *options;
+    if (useRestoration) {
+        // Initialize with state restoration to recover from previous state
+        options = @{
+            CBPeripheralManagerOptionRestoreIdentifierKey: kBlenoRestorationIdentifier,
+            CBPeripheralManagerOptionShowPowerAlertKey: @YES
+        };
+        self.triedWithRestoration = YES;
+    } else {
+        // Initialize without state restoration
+        options = @{
+            CBPeripheralManagerOptionShowPowerAlertKey: @YES
+        };
+        self.triedWithRestoration = NO;
+    }
+    
     self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self
-                                                                     queue:self.processingQueue];
+                                                                     queue:self.processingQueue
+                                                                   options:options];
 }
 
 - (void)startAdvertising:(nonnull NSString *)name serviceUUIDs:(nonnull NSArray<CBUUID *> *)serviceUUIDs 
@@ -99,9 +136,21 @@
 
 - (void)setServices:(NSArray<CBMutableService *> *)services 
 {
+    // Store services for cleanup later
+    [self.currentServices addObjectsFromArray:services];
+    
     for (CBMutableService *service in services) {
         [self.peripheralManager addService:service];
     }
+}
+
+- (void)removeAllServices 
+{
+    if (self.peripheralManager) {
+        [self.peripheralManager removeAllServices];
+    }
+    [self.currentServices removeAllObjects];
+    emitters.clear();
 }
 
 - (void)disconnect 
@@ -117,7 +166,20 @@
 #pragma mark - CBPeripheralManagerDelegate
 
 - (void)peripheralManagerDidUpdateState:(CBPeripheralManager *)peripheral 
-{
+{   
+    // Check if state is unsupported and we tried with restoration - retry without it
+    if (peripheral.state == CBManagerStateUnsupported && 
+        self.triedWithRestoration && 
+        !self.retriedWithoutRestoration) {
+        self.retriedWithoutRestoration = YES;
+        
+        // Dispatch async to avoid modifying peripheral manager during delegate callback
+        dispatch_async(self.processingQueue, ^{
+            [self startWithRestoration:NO];
+        });
+        return;
+    }
+    
     auto state = StringFromCBPeripheralState(peripheral.state);
     emit.StateChange(state);
 }
@@ -137,6 +199,13 @@
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral central:(CBCentral *)central didSubscribeToCharacteristic:(CBMutableCharacteristic *)characteristic 
 {
+    // Track connected centrals and emit accept event for new connections
+    BOOL isNewConnection = ![self.connectedCentrals containsObject:central.identifier];
+    if (isNewConnection) {
+        [self.connectedCentrals addObject:central.identifier];
+        emit.Accept(central.identifier);
+    }
+    
     for (auto it = emitters.begin(); it != emitters.end(); ++it) {
         if ([it->first isEqual:characteristic.UUID] == NO) { continue; }
         auto cb = [weakSelf = self, characteristic, central](NSData *data) {
@@ -156,6 +225,13 @@
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveReadRequest:(CBATTRequest *)request 
 {
+    // Track connected centrals on read requests too
+    BOOL isNewConnection = ![self.connectedCentrals containsObject:request.central.identifier];
+    if (isNewConnection) {
+        [self.connectedCentrals addObject:request.central.identifier];
+        emit.Accept(request.central.identifier);
+    }
+    
     for (auto it = emitters.begin(); it != emitters.end(); ++it) {
         if ([it->first isEqual:request.characteristic.UUID] == NO) { continue; }
         auto cb = [peripheral, request](int result, NSData *data) {
@@ -169,6 +245,13 @@
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveWriteRequests:(NSArray<CBATTRequest *> *)requests 
 {
     for (CBATTRequest *request in requests) {
+        // Track connected centrals on write requests too
+        BOOL isNewConnection = ![self.connectedCentrals containsObject:request.central.identifier];
+        if (isNewConnection) {
+            [self.connectedCentrals addObject:request.central.identifier];
+            emit.Accept(request.central.identifier);
+        }
+        
         CBCharacteristic *characteristic = request.characteristic;
         for (auto it = emitters.begin(); it != emitters.end(); ++it) {
             if ([it->first isEqual:characteristic.UUID] == NO) { continue; }
@@ -191,6 +274,35 @@
 - (void)peripheralManagerIsReadyToUpdateSubscribers:(CBPeripheralManager *)peripheral 
 {
     [self processNotificationQueue];
+}
+
+#pragma mark - State Restoration
+
+- (void)peripheralManager:(CBPeripheralManager *)peripheral willRestoreState:(NSDictionary<NSString *, id> *)dict 
+{
+    // Restore services that were previously registered
+    NSArray<CBMutableService *> *restoredServices = dict[CBPeripheralManagerRestoredStateServicesKey];
+    if (restoredServices) {
+        [self.currentServices addObjectsFromArray:restoredServices];
+        
+        // Iterate through restored services to find subscribed centrals
+        for (CBMutableService *service in restoredServices) {
+            if (service.characteristics) {
+                for (CBMutableCharacteristic *characteristic in service.characteristics) {
+                    // Check for subscribed centrals on this characteristic
+                    if (characteristic.subscribedCentrals && characteristic.subscribedCentrals.count > 0) {
+                        for (CBCentral *central in characteristic.subscribedCentrals) {
+                            if (![self.connectedCentrals containsObject:central.identifier]) {
+                                [self.connectedCentrals addObject:central.identifier];
+                                // Emit accept event for the restored connection
+                                emit.Accept(central.identifier);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @end

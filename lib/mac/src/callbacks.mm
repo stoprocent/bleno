@@ -60,6 +60,18 @@ void Emit::StateChange(const std::string& state) {
     });
 }
 
+void Emit::Accept(NSUUID *centralUuid) {
+    mCallback->call([centralUuid](Napi::Env env, std::vector<napi_value>& args) {
+        args = { _s("accept"), _a(centralUuid), _a(centralUuid) };
+    });
+}
+
+void Emit::Disconnect(NSUUID *centralUuid) {
+    mCallback->call([centralUuid](Napi::Env env, std::vector<napi_value>& args) {
+        args = { _s("disconnect"), _a(centralUuid) };
+    });
+}
+
 void EmitCharacteristic::Wrap(const Napi::Value& receiver, const Napi::Function& callback) {
     mCallback = std::make_shared<ThreadSafeCallback>(receiver, callback);
 }

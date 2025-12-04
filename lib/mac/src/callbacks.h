@@ -15,6 +15,8 @@ public:
     void AdvertisingStop();
     void ServicesSet(NSError * _Nullable error);
     void StateChange(const std::string& state);
+    void Accept(NSUUID *centralUuid);
+    void Disconnect(NSUUID *centralUuid);
 protected:
     std::shared_ptr<ThreadSafeCallback> mCallback;
 };
