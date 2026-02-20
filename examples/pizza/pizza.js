@@ -1,6 +1,6 @@
-const NobleEventEmitter = require('../../lib/noble-event-emitter');
+const BlenoEventEmitter = require('../../lib/bleno-event-emitter');
 
-class Pizza extends NobleEventEmitter {
+class Pizza extends BlenoEventEmitter {
   constructor () {
     super();
     this.toppings = PizzaToppings.NONE;
