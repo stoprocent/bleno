@@ -1,6 +1,6 @@
-const events = require('events');
+const NobleEventEmitter = require('../../lib/noble-event-emitter');
 
-class Pizza extends events.EventEmitter {
+class Pizza extends NobleEventEmitter {
   constructor () {
     super();
     this.toppings = PizzaToppings.NONE;
