@@ -12,7 +12,6 @@ jobs:
         include:
           - name: darwin
             os: macos-latest
-            node: x64
             command: prebuildify
             args: --arch x64+arm64
           - name: win32-x86

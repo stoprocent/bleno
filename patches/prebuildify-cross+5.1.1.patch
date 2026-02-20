@@ -1,0 +1,30 @@
+diff --git a/node_modules/prebuildify-cross/guest.js b/node_modules/prebuildify-cross/guest.js
+index dfd9eb7..6d284fb 100644
+--- a/node_modules/prebuildify-cross/guest.js
++++ b/node_modules/prebuildify-cross/guest.js
+@@ -9,19 +9,15 @@ const cwd = '/home/node/app'
+ const files = JSON.parse(process.env.PREBUILDIFY_CROSS_FILES)
+ const argv = process.argv.slice(2)
+ 
+-// Copy host files to working directory
+-for (const file of files) {
+-  const a = path.join('/input', file)
+-  const b = path.join(cwd, file)
++// Recursively copy all input files to working directory
++fs.cpSync('/input', cwd, { recursive: true })
+ 
+-  fs.mkdirSync(path.dirname(b), { recursive: true })
+-  fs.copyFileSync(a, b, fs.constants.COPYFILE_EXCL)
+-  fs.chmodSync(b, 0o644)
++// Clean build directory if it exists to ensure fresh build
++const buildDir = path.join(cwd, 'build')
++if (fs.existsSync(buildDir)) {
++  fs.rmSync(buildDir, { recursive: true, force: true })
+ }
+ 
+-// Use node_modules of host to avoid a second install step
+-fs.symlinkSync('/input/node_modules', path.join(cwd, 'node_modules'))
+-
+ const stdio = ['ignore', 2, 2]
+ const res = cp.spawnSync('npx', ['--no-install', 'prebuildify', ...argv], { cwd, stdio })
+ 

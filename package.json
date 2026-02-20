@@ -19,7 +19,7 @@
     "lint": "eslint \"**/*.js\"",
     "lint-fix": "eslint \"**/*.js\" --fix",
     "prebuildify": "prebuildify --napi --target 14.0.0 --force --strip --verbose",
-    "prebuildify-cross": "prebuildify-cross --napi --target 14.0.0 --force --strip --verbose",
+    "prebuildify-cross": "patch-package && prebuildify-cross --napi --target 14.0.0 --force --strip --verbose",
     "semantic-release": "semantic-release",
     "pretest": "npm run rebuild",
     "rebuild": "node-gyp rebuild",
@@ -66,11 +66,12 @@
   },
   "dependencies": {
     "debug": "^4.4.0",
+    "patch-package": "^8.0.0",
     "node-addon-api": "^8.3.1",
     "node-gyp-build": "^4.8.4"
   },
   "optionalDependencies": {
-    "@stoprocent/bluetooth-hci-socket": "^2.2.3"
+    "@stoprocent/bluetooth-hci-socket": "^2.2.5"
   },
   "publishConfig": {
     "access": "public"
