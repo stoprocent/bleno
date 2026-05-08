@@ -42,7 +42,7 @@ declare module '@stoprocent/bleno' {
         onWriteRequest?: OnWriteRequestFn | null;
     }
 
-    export class Characteristic {
+    export class Characteristic extends EventEmitter {
         uuid: string;
         properties: ReadonlyArray<Property>;
         secure: ReadonlyArray<Property>;
@@ -59,6 +59,14 @@ declare module '@stoprocent/bleno' {
         onWriteRequest(handle: ConnectionHandle, data: Buffer, offset: number, withoutResponse: boolean, callback: WriteRequestCallback): void;
 
         toString(): string;
+
+        on(event: 'readRequest', listener: (handle: ConnectionHandle, offset: number, callback: ReadRequestCallback) => void): this;
+        on(event: 'writeRequest', listener: (handle: ConnectionHandle, data: Buffer, offset: number, withoutResponse: boolean, callback: WriteRequestCallback) => void): this;
+        on(event: 'subscribe', listener: (handle: ConnectionHandle, maxValueSize: number, updateValueCallback: UpdateValueCallback) => void): this;
+        on(event: 'unsubscribe', listener: (handle: ConnectionHandle) => void): this;
+        on(event: 'notify', listener: (handle: ConnectionHandle) => void): this;
+        on(event: 'indicate', listener: (handle: ConnectionHandle) => void): this;
+        on(event: string | symbol, listener: (...args: any[]) => void): this;
 
         readonly RESULT_ATTR_NOT_LONG: number;
         readonly RESULT_INVALID_ATTRIBUTE_LENGTH: number;
@@ -92,7 +100,7 @@ declare module '@stoprocent/bleno' {
         characteristics?: ReadonlyArray<Characteristic> | null;
     }
 
-    export class PrimaryService {
+    export class PrimaryService extends EventEmitter {
         uuid: string;
         characteristics: ReadonlyArray<Characteristic>;
 
