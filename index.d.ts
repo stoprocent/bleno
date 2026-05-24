@@ -60,6 +60,10 @@ declare module '@stoprocent/bleno' {
 
         toString(): string;
 
+        getMaxValueSize(handle: ConnectionHandle): number | undefined;
+        getUpdateValueCallback(handle: ConnectionHandle): UpdateValueCallback | undefined;
+        notify(data: Buffer, handle?: ConnectionHandle | null): void;
+
         readonly RESULT_ATTR_NOT_LONG: number;
         readonly RESULT_INVALID_ATTRIBUTE_LENGTH: number;
         readonly RESULT_INVALID_OFFSET: number;
