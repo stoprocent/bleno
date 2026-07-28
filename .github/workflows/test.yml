@@ -24,7 +24,7 @@ jobs:
           # arch isn't used and we have no way to use it currently
           - { os: macos-latest, arch: x64 }
           - { os: ubuntu-latest, arch: x64 }
-          - { os: windows-latest, arch: x64 }
+          - { os: windows-2022, arch: x64 }
     steps:
     - if: matrix.config.os == 'macos-latest'
       run: sudo -H pip install setuptools
