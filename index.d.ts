@@ -116,7 +116,7 @@ declare module '@stoprocent/bleno' {
 
         readonly state: State;
 
-        disconnect(): void;
+        disconnect(handle?: ConnectionHandle | null): void;
 
         stop(): void;
 
@@ -172,7 +172,7 @@ declare module '@stoprocent/bleno' {
         on(event: 'rssiUpdate', cb: (rssi: number) => void): this;
     }
 
-    export type BindingType = 'default' | 'hci' | 'mac';
+    export type BindingType = 'default' | 'hci' | 'mac' | 'win';
 
     export interface BaseBindingsOptions {
 
@@ -193,7 +193,11 @@ declare module '@stoprocent/bleno' {
 
     }
 
-    export type WithBindingsOptions = HciBindingsOptions | MacBindingsOptions;
+    export interface WinBindingsOptions extends BaseBindingsOptions {
+
+    }
+
+    export type WithBindingsOptions = HciBindingsOptions | MacBindingsOptions | WinBindingsOptions;
 
     export function withBindings(
         bindingType?: BindingType, 
