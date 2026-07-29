@@ -25,20 +25,23 @@ public:
     void call(ArgumentFunction argFunction);
 
 private:
+    struct CallbackContext {
+        Napi::Reference<Napi::Value> receiver;
+    };
+
     // Static callback handler
     static void callJsCallback(Napi::Env env,
                              Napi::Function jsCallback,
-                             Napi::Reference<Napi::Value>* context,
+                             CallbackContext* context,
                              ArgumentFunction* argFn);
 
     // Type alias for the thread-safe function
     using ThreadSafeFunc = Napi::TypedThreadSafeFunction<
-        Napi::Reference<Napi::Value>,
+        CallbackContext,
         ArgumentFunction,
         callJsCallback>;
 
     // Member variables
-    Napi::Reference<Napi::Value> receiver_;
     ThreadSafeFunc threadSafeFunction_;
 };
 
@@ -57,22 +60,31 @@ inline ThreadSafeCallback::ThreadSafeCallback(
             "Callback must be a function");
     }
 
-    receiver_ = Napi::Persistent(receiver);
-    threadSafeFunction_ = ThreadSafeFunc::New(
-        jsCallback.Env(),
-        jsCallback,
-        "ThreadSafeCallback callback",
-        0, 1,
-        &receiver_);
+    auto* context = new CallbackContext();
+    context->receiver = Napi::Persistent(receiver);
+    try {
+        threadSafeFunction_ = ThreadSafeFunc::New(
+            jsCallback.Env(),
+            jsCallback,
+            "ThreadSafeCallback callback",
+            0, 1,
+            context,
+            [](Napi::Env, void*, CallbackContext* callbackContext) {
+                delete callbackContext;
+            });
+    } catch (...) {
+        delete context;
+        throw;
+    }
 }
 
 inline ThreadSafeCallback::~ThreadSafeCallback() {
-    threadSafeFunction_.Abort();
+    threadSafeFunction_.Release();
 }
 
 inline void ThreadSafeCallback::call(ArgumentFunction argFunction) {
     auto argFn = new ArgumentFunction(argFunction);
-    if (threadSafeFunction_.BlockingCall(argFn) != napi_ok) {
+    if (threadSafeFunction_.NonBlockingCall(argFn) != napi_ok) {
         delete argFn;
     }
 }
@@ -80,16 +92,18 @@ inline void ThreadSafeCallback::call(ArgumentFunction argFunction) {
 inline void ThreadSafeCallback::callJsCallback(
     Napi::Env env,
     Napi::Function jsCallback,
-    Napi::Reference<Napi::Value>* context,
+    CallbackContext* context,
     ArgumentFunction* argFn) {
-    
-    if (argFn != nullptr) {
-        ArgumentVector args;
-        (*argFn)(env, args);
-        delete argFn;
 
-        if (env != nullptr && jsCallback != nullptr) {
-            jsCallback.Call(context->Value(), args);
-        }
+    std::unique_ptr<ArgumentFunction> argumentFunction(argFn);
+    if (argumentFunction == nullptr ||
+        env == nullptr ||
+        jsCallback == nullptr ||
+        context == nullptr) {
+        return;
     }
+
+    ArgumentVector args;
+    (*argumentFunction)(env, args);
+    jsCallback.Call(context->receiver.Value(), args);
 }

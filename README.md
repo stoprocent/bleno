@@ -66,6 +66,7 @@ import { withBindings } from "@stoprocent/bleno";
 
 const bleno = withBindings('default');
 const bleno = withBindings('mac');
+const bleno = withBindings('win');
 const bleno = withBindings('hci', { hciDriver: '...', bindParams: ... });
 ```
 
@@ -196,12 +197,23 @@ Make sure you have read and write permissions on the ```/dev/usb/*``` device tha
 
 ### Windows
 
- * [node-gyp requirements for Windows](https://github.com/TooTallNate/node-gyp#installation)
-   * Python 2.7
-   * Visual Studio ([Express](https://www.visualstudio.com/en-us/products/visual-studio-express-vs.aspx))
- * [node-bluetooth-hci-socket prerequisites](https://github.com/sandeepmistry/node-bluetooth-hci-socket#windows)
-   * Compatible Bluetooth 4.0 USB adapter
-   * [WinUSB](https://msdn.microsoft.com/en-ca/library/windows/hardware/ff540196(v=vs.85).aspx) driver setup for Bluetooth 4.0 USB adapter, using [Zadig tool](http://zadig.akeo.ie/)
+The default Windows binding uses the native WinRT GATT server and the normal
+Windows Bluetooth driver. The adapter must support the Bluetooth LE peripheral
+role. Building from source requires the current [node-gyp requirements for
+Windows](https://github.com/nodejs/node-gyp#on-windows), including Python and
+the Visual Studio C++ workload with a Windows SDK.
+
+The native binding supports dynamic services and descriptors, read and write
+requests, notifications and indications, multiple subscribed clients, MTU
+updates, and connection lifecycle events. Windows chooses the advertised local
+name; WinRT does not allow an application publisher to override it. Raw EIR and
+iBeacon advertising and peer RSSI reads are not exposed by this binding. A
+server-requested disconnect closes its GATT session, while Windows retains
+control of the physical Bluetooth link.
+
+The raw HCI binding remains available explicitly with `withBindings('hci')`.
+That mode requires a compatible USB adapter using WinUSB and should not be used
+with the native binding at the same time.
 
 ## API Reference
 
@@ -315,7 +327,8 @@ await bleno.setServicesAsync(services);
 #### Disconnect client
 
 ```javascript
-bleno.disconnect(); // Linux only
+bleno.disconnect(); // disconnect all active clients
+bleno.disconnect(handle); // disconnect the client for a connection handle
 ```
 
 #### Update RSSI
