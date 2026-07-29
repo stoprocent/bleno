@@ -30,6 +30,7 @@ struct CharacteristicDefinition {
     bool hasStaticValue{ false };
     Data staticValue;
     std::string userDescription;
+    std::vector<winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattPresentationFormat> presentationFormats;
     std::vector<DescriptorDefinition> descriptors;
     std::shared_ptr<EmitCharacteristic> emitter;
 };
@@ -107,6 +108,7 @@ private:
 
     std::recursive_mutex mMutex;
     bool mAdvertising{ false };
+    bool mWarnedAboutName{ false };
     std::atomic<bool> mStopped{ false };
     AdapterState mRadioState{ AdapterState::Initial };
     std::string mName;

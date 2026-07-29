@@ -62,6 +62,53 @@ std::string BluetoothErrorMessage(const std::string& operation, BluetoothError e
         std::to_string(static_cast<int32_t>(error));
 }
 
+// Resolves the 16-bit SIG alias of a UUID built on the Bluetooth base UUID
+// (0000xxxx-0000-1000-8000-00805F9B34FB), so short ('2902') and long forms
+// are both recognised.
+bool TryGetBluetoothAlias(const winrt::guid& uuid, uint16_t& alias) {
+    constexpr uint8_t base[8] = { 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB };
+    if (uuid.Data2 != 0x0000 || uuid.Data3 != 0x1000) {
+        return false;
+    }
+    for (size_t index = 0; index < 8; ++index) {
+        if (uuid.Data4[index] != base[index]) {
+            return false;
+        }
+    }
+    if ((uuid.Data1 & 0xFFFF0000u) != 0) {
+        return false;
+    }
+    alias = static_cast<uint16_t>(uuid.Data1 & 0xFFFFu);
+    return true;
+}
+
+// Descriptors Windows publishes itself; creating them explicitly fails with
+// "The provided descriptor uuid is reserved and will be automatically
+// published by the system."
+bool IsSystemManagedDescriptor(uint16_t alias) {
+    return alias == 0x2900 ||  // Characteristic Extended Properties
+        alias == 0x2902 ||     // Client Characteristic Configuration
+        alias == 0x2903;       // Server Characteristic Configuration
+}
+
+// 0x2904 Characteristic Presentation Format is also reserved, but Windows
+// accepts its contents through GattLocalCharacteristicParameters, so the
+// declared value is preserved rather than dropped.
+bool TryParsePresentationFormat(const Data& value, GattPresentationFormat& format) {
+    if (value.size() < 7) {
+        return false;
+    }
+    const auto unit = static_cast<uint16_t>(value[2] | (value[3] << 8));
+    const auto description = static_cast<uint16_t>(value[5] | (value[6] << 8));
+    format = GattPresentationFormat::FromParts(
+        value[0],
+        static_cast<int32_t>(static_cast<int8_t>(value[1])),
+        unit,
+        value[4],
+        description);
+    return true;
+}
+
 std::vector<ServiceDefinition> ParseServices(const Napi::Array& services) {
     std::vector<ServiceDefinition> result;
     result.reserve(services.Length());
@@ -120,13 +167,23 @@ std::vector<ServiceDefinition> ParseServices(const Napi::Array& services) {
                     descriptorObject.Get("uuid").ToString().Utf8Value();
                 const auto descriptorValue = FromNapiValue(descriptorObject.Get("value"));
 
-                if (descriptorUuid == "2901") {
+                const auto descriptorGuid = ToGuid(descriptorUuid);
+                uint16_t alias = 0;
+                const bool isSigDescriptor =
+                    TryGetBluetoothAlias(descriptorGuid, alias);
+
+                if (isSigDescriptor && alias == 0x2901) {
                     characteristic.userDescription = std::string(
                         descriptorValue.begin(),
                         descriptorValue.end());
-                } else if (descriptorUuid != "2902") {
+                } else if (isSigDescriptor && alias == 0x2904) {
+                    GattPresentationFormat format{ nullptr };
+                    if (TryParsePresentationFormat(descriptorValue, format)) {
+                        characteristic.presentationFormats.push_back(format);
+                    }
+                } else if (!isSigDescriptor || !IsSystemManagedDescriptor(alias)) {
                     characteristic.descriptors.push_back({
-                        ToGuid(descriptorUuid),
+                        descriptorGuid,
                         descriptorValue,
                     });
                 }
@@ -191,6 +248,16 @@ void BLEPeripheralManager::StartAdvertising(
     mAdvertisedServiceUuids = serviceUuids;
     try {
         mAdvertising = true;
+        // GattServiceProviderAdvertisingParameters exposes no local name: Windows
+        // always advertises the system Bluetooth name. Say so instead of silently
+        // ignoring the caller's name.
+        if (!mName.empty() && !mWarnedAboutName) {
+            mWarnedAboutName = true;
+            mEmit.Warning(
+                "The native Windows binding cannot set the advertised local name; "
+                "Windows advertises the system Bluetooth name instead. Discover this "
+                "peripheral by its service UUID rather than by the name '" + mName + "'.");
+        }
         StartProviders();
         mEmit.AdvertisingStart();
     } catch (const winrt::hresult_error& error) {
@@ -251,7 +318,11 @@ void BLEPeripheralManager::SetServices(
             providerContext.advertisementStatusChanged =
                 providerContext.provider.AdvertisementStatusChanged(
                     [this](const auto&, const auto& args) {
+                        // Windows briefly reports Aborted with BluetoothError::Success
+                        // while the provider re-tunes its advertisement during startup.
+                        // Only surface a genuine failure.
                         if (args.Status() == GattServiceProviderAdvertisementStatus::Aborted &&
+                            args.Error() != BluetoothError::Success &&
                             !mStopped) {
                             mEmit.AdvertisingStart(BluetoothErrorMessage(
                                 "Advertising GATT service",
@@ -273,6 +344,9 @@ void BLEPeripheralManager::SetServices(
                 if (!definition.userDescription.empty()) {
                     parameters.UserDescription(
                         winrt::to_hstring(definition.userDescription));
+                }
+                for (const auto& format : definition.presentationFormats) {
+                    parameters.PresentationFormats().Append(format);
                 }
 
                 auto characteristicResult =

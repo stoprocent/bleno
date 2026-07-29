@@ -17,6 +17,7 @@ public:
     void Wrap(const Napi::Value& receiver, const Napi::Function& callback);
     void Platform(const std::string& platform);
     void StateChange(const std::string& state);
+    void Warning(const std::string& message);
     void AdvertisingStart(const std::string& error = {});
     void AdvertisingStop();
     void ServicesSet(const std::string& error = {});

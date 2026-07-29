@@ -44,6 +44,15 @@ void Emit::StateChange(const std::string& state) {
     });
 }
 
+void Emit::Warning(const std::string& message) {
+    mCallback->call([message](Napi::Env env, std::vector<napi_value>& args) {
+        args = {
+            Napi::String::New(env, "warning"),
+            Napi::String::New(env, message),
+        };
+    });
+}
+
 void Emit::AdvertisingStart(const std::string& error) {
     mCallback->call([error](Napi::Env env, std::vector<napi_value>& args) {
         args = {
