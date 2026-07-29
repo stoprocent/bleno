@@ -211,7 +211,9 @@ winrt::fire_and_forget NotifyClient(
 
 BLEPeripheralManager::BLEPeripheralManager(
     const Napi::Value& receiver,
-    const Napi::Function& callback) {
+    const Napi::Function& callback,
+    bool extendedAdvertising)
+    : mExtendedAdvertising(extendedAdvertising) {
     mEmit.Wrap(receiver, callback);
 }
 
@@ -428,6 +430,22 @@ void BLEPeripheralManager::StartProviders() {
     GattServiceProviderAdvertisingParameters parameters;
     parameters.IsDiscoverable(true);
     parameters.IsConnectable(true);
+    if (mExtendedAdvertising) {
+        // Requesting a secondary PHY switches Windows from legacy to extended
+        // advertising. Some Bluetooth 5 controllers only advertise reliably in
+        // extended mode, even though the legacy request is accepted and the
+        // provider still reports Started.
+        if (auto extended =
+                parameters.try_as<IGattServiceProviderAdvertisingParameters3>()) {
+            extended.UseLowEnergyUncoded1MPhyAsSecondaryPhy(true);
+        } else if (!mWarnedAboutExtended) {
+            mWarnedAboutExtended = true;
+            mEmit.Warning(
+                "Extended advertising was requested but this version of Windows "
+                "does not expose the secondary PHY parameters; falling back to "
+                "legacy advertising.");
+        }
+    }
     for (auto& context : mProviders) {
         const auto status = context.provider.AdvertisementStatus();
         if (status != GattServiceProviderAdvertisementStatus::Started &&
@@ -714,6 +732,16 @@ void BLEPeripheralManager::Stop() noexcept {
 
 BlenoWinRT::BlenoWinRT(const Napi::CallbackInfo& info)
     : Napi::ObjectWrap<BlenoWinRT>(info) {
+    if (info.Length() > 0 && info[0].IsObject()) {
+        auto options = info[0].As<Napi::Object>();
+        auto value = options.Get("extendedAdvertising");
+        if (!value.IsUndefined() && !value.IsNull()) {
+            mExtendedAdvertising = value.ToBoolean();
+        }
+    }
+    if (GetEnvironmentVariableA("BLENO_WIN_EXTENDED_ADV", nullptr, 0) != 0) {
+        mExtendedAdvertising = true;
+    }
 }
 
 BlenoWinRT::~BlenoWinRT() {
@@ -746,7 +774,8 @@ Napi::Value BlenoWinRT::Init(const Napi::CallbackInfo& info) {
 
     mPeripheralManager = std::make_unique<BLEPeripheralManager>(
         receiver,
-        emit.As<Napi::Function>());
+        emit.As<Napi::Function>(),
+        mExtendedAdvertising);
     mPeripheralManager->Start();
     return info.Env().Undefined();
 }

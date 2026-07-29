@@ -42,7 +42,10 @@ struct ServiceDefinition {
 
 class BLEPeripheralManager {
 public:
-    BLEPeripheralManager(const Napi::Value& receiver, const Napi::Function& callback);
+    BLEPeripheralManager(
+        const Napi::Value& receiver,
+        const Napi::Function& callback,
+        bool extendedAdvertising = false);
     ~BLEPeripheralManager();
 
     void Start();
@@ -109,6 +112,8 @@ private:
     std::recursive_mutex mMutex;
     bool mAdvertising{ false };
     bool mWarnedAboutName{ false };
+    bool mWarnedAboutExtended{ false };
+    bool mExtendedAdvertising{ false };
     std::atomic<bool> mStopped{ false };
     AdapterState mRadioState{ AdapterState::Initial };
     std::string mName;
@@ -140,4 +145,5 @@ public:
 private:
     BLEPeripheralManager& Manager(const Napi::CallbackInfo& info);
     std::unique_ptr<BLEPeripheralManager> mPeripheralManager;
+    bool mExtendedAdvertising{ false };
 };
