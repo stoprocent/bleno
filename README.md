@@ -66,6 +66,7 @@ import { withBindings } from "@stoprocent/bleno";
 
 const bleno = withBindings('default');
 const bleno = withBindings('mac');
+const bleno = withBindings('win');
 const bleno = withBindings('hci', { hciDriver: '...', bindParams: ... });
 ```
 
@@ -326,7 +327,8 @@ await bleno.setServicesAsync(services);
 #### Disconnect client
 
 ```javascript
-bleno.disconnect(); // Linux only
+bleno.disconnect(); // disconnect all active clients
+bleno.disconnect(handle); // disconnect the client for a connection handle
 ```
 
 #### Update RSSI
